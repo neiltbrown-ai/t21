@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T21 - Down Syndrome Resources Directory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --color-primary: #0066CC;
+            --color-secondary: #4ECDC4;
+            --color-tertiary: #F97316;
+            --color-black: #111;
+            --color-white: #fff;
+            --color-gray-light: #f7f7f7;
+            --color-gray-border: #e0e0e0;
+            --color-gray-text: #666;
+            --color-gray-dark: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-white);
+            color: var(--color-black);
+            line-height: 1.5;
+        }
+
+        /* Header */
+        header {
+            background: var(--color-white);
+            border-bottom: 2px solid var(--color-black);
+            padding: 0 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 70px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-black);
+            text-decoration: none;
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--color-black);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--color-primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-black);
+            padding: 0.5rem;
+            z-index: 101;
+        }
+
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--color-white);
+            z-index: 98;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 0.25rem;
+            padding-top: 2rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .mobile-menu-overlay.open {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-menu-overlay a {
+            font-size: 1.75rem;
+            font-weight: 300;
+            text-decoration: none;
+            color: var(--color-black);
+            padding: 0.5rem 2rem;
+            transition: color 0.2s;
+        }
+
+        .mobile-menu-overlay a:hover,
+        .mobile-menu-overlay a.active {
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            margin-top: 70px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--color-gray-light);
+            border-right: 1px solid var(--color-gray-border);
+            overflow-y: auto;
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            transition: width 0.3s ease, padding 0.3s ease;
+            width: 220px;
+            padding: 1.5rem;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+            padding: 1rem 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 0 0.25rem;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0;
+            justify-content: center;
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-black);
+            font-weight: 700;
+        }
+
+        .sidebar.collapsed .sidebar-title {
+            display: none;
+        }
+
+        .sidebar-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--color-black);
+            padding: 4px;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .sidebar-toggle-btn {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-toggle-btn:hover {
+            color: var(--color-primary);
+        }
+
+        /* Facets */
+        .facet {
+            margin-bottom: 1.75rem;
+        }
+
+        .sidebar.collapsed .facet {
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .facet-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--color-black);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar.collapsed .facet-title {
+            display: none;
+        }
+
+        .facet-icon {
+            width: 36px;
+            height: 36px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sidebar.collapsed .facet-icon {
+            display: flex;
+        }
+
+        .facet-icon:hover {
+            background: var(--color-gray-border);
+        }
+
+        .facet-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--color-black);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .filter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--color-gray-dark);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .sidebar.collapsed .filter {
+            display: none;
+        }
+
+        .filter input {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+
+        .filter:hover {
+            color: var(--color-black);
+        }
+
+        .reset-filters-btn {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--color-gray-border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-bottom: 1.5rem;
+            background: var(--color-white);
+            color: var(--color-gray-text);
+        }
+
+        .reset-filters-btn:hover {
+            border-color: #999;
+        }
+
+        .reset-filters-btn.active {
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
+        }
+
+        .reset-filters-btn.active:hover {
+            background: #0052a3;
+            border-color: #0052a3;
+        }
+
+        .sidebar.collapsed .reset-filters-btn {
+            display: none;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem 2.5rem;
+            background: var(--color-white);
+            min-height: calc(100vh - 70px);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: var(--color-gray-text);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-count {
+            font-size: 0.85rem;
+            color: var(--color-gray-text);
+            font-weight: 500;
+        }
+
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sort-controls label {
+            font-size: 0.8rem;
+            color: var(--color-gray-text);
+            font-weight: 500;
+        }
+
+        .sort-controls select {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-gray-border);
+            border-radius: 4px;
+            background: var(--color-white);
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-border);
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        .card:hover {
+            border-color: #999;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-image {
+            width: 140px;
+            height: 95px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+            color: var(--color-black);
+        }
+
+        .card:hover .card-title {
+            color: var(--color-primary);
+        }
+
+        .card-org {
+            font-size: 0.75rem;
+            color: var(--color-gray-text);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--color-gray-text);
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .card-tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            background: var(--color-gray-light);
+            color: var(--color-gray-dark);
+            padding: 0.25rem 0.5rem;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+
+        .card-tag.highlight {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .card-amount {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.15rem;
+            flex-shrink: 0;
+        }
+
+        .card-amount-label {
+            font-size: 0.6rem;
+            color: var(--color-gray-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .card-amount-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-black);
+        }
+
+        /* Inspiration Cards */
+        .inspiration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .inspiration-card {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-border);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        .inspiration-card:hover {
+            border-color: #999;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .inspiration-card-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .inspiration-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--color-white);
+            border: 2px solid rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-gray-text);
+            flex-shrink: 0;
+        }
+
+        .inspiration-card-header-text {
+            min-width: 0;
+        }
+
+        .inspiration-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .inspiration-card:hover .inspiration-name {
+            color: var(--color-white);
+        }
+
+        .inspiration-location {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.15rem;
+        }
+
+        .inspiration-card-body {
+            padding: 1.25rem;
+        }
+
+        .inspiration-field-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            margin-bottom: 0.75rem;
+        }
+
+        .inspiration-bio {
+            font-size: 0.85rem;
+            color: var(--color-gray-text);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Load More Button */
+        .load-more-btn {
+            background: var(--color-white);
+            border: 2px solid var(--color-black);
+            color: var(--color-black);
+            padding: 0.75rem 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin: 2rem auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        .load-more-btn:hover {
+            background: var(--color-black);
+            color: var(--color-white);
+        }
+
+        /* Detail Pages */
+        .detail-page {
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+            background: var(--color-white);
+        }
+
+        .detail-back-bar {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-gray-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 70px;
+            z-index: 50;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.95);
+        }
+
+        .detail-back-bar-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--color-primary);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .detail-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Resource Detail - Image Banner */
+        .detail-image-banner {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .detail-image-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detail-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+        }
+
+        .detail-org {
+            font-size: 0.9rem;
+            color: var(--color-gray-text);
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-amount-box {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-gray-border);
+        }
+
+        .detail-amount-label {
+            font-size: 0.65rem;
+            color: var(--color-gray-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .detail-amount-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-black);
+        }
+
+        .detail-amount-suffix {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--color-gray-text);
+        }
+
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 0.4rem 0.75rem;
+            border-radius: 4px;
+            background: var(--color-gray-light);
+            color: var(--color-gray-dark);
+        }
+
+        .detail-tag.green {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .detail-description {
+            color: var(--color-gray-dark);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+
+        .detail-description p {
+            margin-bottom: 1.25rem;
+        }
+
+        .detail-description p:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-family: inherit;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+
+        .btn-secondary {
+            background: var(--color-white);
+            color: var(--color-black);
+            border: 2px solid var(--color-gray-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-black);
+        }
+
+        .btn-secondary-light {
+            background: var(--color-white);
+            color: var(--color-primary);
+            border: 2px solid var(--color-gray-border);
+        }
+
+        .btn-secondary-light:hover {
+            background: var(--color-gray-light);
+        }
+
+        .detail-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .detail-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-grid-item label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-gray-text);
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .detail-grid-item span {
+            font-size: 0.95rem;
+            color: var(--color-gray-dark);
+        }
+
+        .detail-info-item {
+            margin-bottom: 1.25rem;
+        }
+
+        .detail-info-item label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-gray-text);
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .detail-info-item span {
+            font-size: 0.95rem;
+            color: var(--color-gray-dark);
+            line-height: 1.6;
+        }
+
+        /* Important Notes Card */
+        .detail-note-card {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 30px rgba(251, 191, 36, 0.15);
+            margin-top: 2rem;
+        }
+
+        .detail-note-card h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-note-card p {
+            font-size: 0.9rem;
+            color: #78350f;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .detail-note-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Inspiration Detail */
+        .inspiration-detail-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .inspiration-detail-banner {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border-radius: 8px;
+            margin-bottom: -60px;
+            overflow: hidden;
+        }
+
+        .inspiration-detail-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .inspiration-detail-profile {
+            padding: 0;
+        }
+
+        .inspiration-detail-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            background: var(--color-white);
+            border: 4px solid var(--color-white);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-gray-text);
+            margin-left: 1rem;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+        }
+
+        .inspiration-detail-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .inspiration-detail-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 0.25rem;
+        }
+
+        .inspiration-detail-subname {
+            font-size: 0.95rem;
+            color: var(--color-gray-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .inspiration-detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--color-gray-text);
+            margin-bottom: 0.75rem;
+        }
+
+        .inspiration-detail-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .inspiration-detail-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 1.25rem 0;
+            border-top: 1px solid var(--color-gray-border);
+            border-bottom: 1px solid var(--color-gray-border);
+            margin-bottom: 2rem;
+        }
+
+        .inspiration-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.85rem;
+            background: var(--color-gray-light);
+            color: var(--color-gray-dark);
+            border: 1px solid var(--color-gray-border);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .social-link:hover {
+            background: var(--color-white);
+            border-color: #999;
+        }
+
+        .quote-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdfa 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .quote-card blockquote {
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--color-black);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .quote-card cite {
+            font-size: 0.9rem;
+            color: var(--color-gray-text);
+            font-style: normal;
+        }
+
+        /* Home Page */
+        .home-hero {
+            background: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
+            color: var(--color-white);
+            padding: 5rem 2.5rem;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .home-hero-content {
+            max-width: 700px;
+        }
+
+        .home-hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--color-white);
+        }
+
+        .home-hero p {
+            font-size: 1.15rem;
+            color: #aaa;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .home-hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .home-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: -3rem auto 0;
+            padding: 0 2.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-border);
+            border-radius: 4px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--color-gray-text);
+            font-weight: 500;
+        }
+
+        .home-section {
+            padding: 5rem 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .home-section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .home-section-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 0.75rem;
+        }
+
+        .home-section-header p {
+            font-size: 1rem;
+            color: var(--color-gray-text);
+        }
+
+        .home-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .home-card {
+            position: relative;
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+
+        .home-card.blue {
+            background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+            border: 1px solid #bfdbfe;
+        }
+
+        .home-card.teal {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
+            border: 1px solid #99f6e4;
+        }
+
+        .home-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            pointer-events: none;
+            transform: translate(30%, -30%);
+        }
+
+        .home-card.blue::before {
+            background: #93c5fd;
+        }
+
+        .home-card.teal::before {
+            background: #5eead4;
+        }
+
+        .home-card:hover {
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+        }
+
+        .home-card-content {
+            position: relative;
+        }
+
+        .home-card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .home-card-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .home-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-black);
+            margin-bottom: 0.75rem;
+        }
+
+        .home-card p {
+            font-size: 0.95rem;
+            color: var(--color-gray-text);
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+        }
+
+        .home-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .home-card-tag {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+        }
+
+        .home-card.blue .home-card-tag {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .home-card.teal .home-card-tag {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+
+        .home-card-link {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .home-card.blue .home-card-link {
+            color: var(--color-primary);
+        }
+
+        .home-card.teal .home-card-link {
+            color: #0d9488;
+        }
+
+        /* About Page */
+        .about-page {
+            background: var(--color-white);
+        }
+
+        .about-hero {
+            background: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
+            color: var(--color-white);
+            padding: 5rem 2.5rem;
+            min-height: 40vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .about-hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.25rem;
+            color: var(--color-white);
+        }
+
+        .about-hero p {
+            font-size: 1.15rem;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .about-section {
+            margin-bottom: 4rem;
+        }
+
+        .about-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-section p {
+            font-size: 1rem;
+            color: var(--color-gray-dark);
+            line-height: 1.8;
+            margin-bottom: 1.25rem;
+        }
+
+        .about-section p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .about-pillars {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2.5rem;
+        }
+
+        .about-pillar {
+            text-align: center;
+        }
+
+        .about-pillar-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+
+        .about-pillar-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .about-pillar h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 0.75rem;
+        }
+
+        .about-pillar p {
+            font-size: 0.9rem;
+            color: var(--color-gray-text);
+            line-height: 1.6;
+        }
+
+        .about-personal {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdfa 100%);
+            border-radius: 12px;
+            padding: 2.5rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        .about-personal h2 {
+            margin-bottom: 1.25rem;
+        }
+
+        .about-cta {
+            text-align: center;
+            padding: 3rem;
+            background: var(--color-gray-light);
+            border-radius: 12px;
+        }
+
+        .about-cta h2 {
+            margin-bottom: 1rem;
+        }
+
+        .about-cta p {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .about-cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .about-pillars {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+
+            .about-cta-buttons {
+                flex-direction: column;
+            }
+
+            .about-cta-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: #111;
+            color: var(--color-white);
+            padding: 3rem 2.5rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .home-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .home-cards {
+                grid-template-columns: 1fr;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+            .sidebar {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                height: calc(100vh - 70px);
+                z-index: 50;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            }
+            .main-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .content {
+                padding-left: 75px;
+                padding-right: 1rem;
+            }
+            .card {
+                flex-direction: column;
+            }
+            .card-image {
+                width: 100%;
+                height: 140px;
+            }
+            .card-amount {
+                align-items: flex-start;
+                margin-top: 0.75rem;
+            }
+            .home-hero h1 {
+                font-size: 2rem;
+            }
+            .home-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            .detail-actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .detail-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // Sample data with expanded descriptions
+        const resourcesData = [
+            {
+                resource_id: "FIN-NAT-0001",
+                resource_name: "Supplemental Security Income (SSI)",
+                organization_type: "Federal Government",
+                subcategories: "Government Benefits",
+                jurisdiction_level: "National",
+                short_description: "Monthly cash payments ($994 in 2026) to families with limited income caring for a child with a qualifying disability.",
+                full_description: "Supplemental Security Income (SSI) provides monthly cash payments ($994 in 2026) to families with limited income caring for a child with a qualifying disability. For children with Down syndrome, this is often the foundational benefit that also unlocks Medicaid coverage.\n\nDown syndrome (non-mosaic Trisomy 21) automatically qualifies through the Compassionate Allowances program, which expedites processing and may provide presumptive payments within days while the claim is reviewed. These payments can continue for up to 6 months without requiring repayment if ultimately denied.\n\nBeyond the monthly cash payment totaling $11,928 annually, SSI recipients automatically qualify for Medicaid in most states, providing comprehensive health coverage often worth $15,000-$50,000+ per year in therapy, medical care, and equipment.",
+                key_features: "• AUTOMATIC DISABILITY QUALIFICATION: Down syndrome diagnosis alone meets medical criteria\n• COMPASSIONATE ALLOWANCES: Expedited processing specific to Down syndrome\n• PRESUMPTIVE PAYMENTS: Can receive up to 6 months of immediate payments while claim processes\n• MEDICAID ELIGIBILITY: Automatic enrollment in most states (the hidden high-value benefit)\n• AGE-18 TRANSITION: Parental income stops counting when child becomes adult",
+                practical_notes: "Many families hesitate to apply for SSI due to stigma or assumption they won't qualify, missing out on thousands in annual benefits plus crucial Medicaid coverage. Even families earning $50,000-$60,000 may qualify depending on family size and deductions.\n\nThe real value often isn't the cash payment but the Medicaid coverage, which provides unlimited therapy (PT, OT, speech), medical equipment, and comprehensive healthcare without copays or deductibles.",
+                amount_min_: 994,
+                amount_max_: 994,
+                amount_type: "Monthly",
+                annual_cap_: 11928,
+                income_limit_exists: "Yes",
+                income_limit_details: "~$45,000-$55,000 for families with 2-3 children",
+                age_min: 0,
+                age_max: 17,
+                eligibility_criteria: "Child disability; US citizen/qualified alien",
+                application_deadline: "Rolling",
+                website: "ssa.gov/ssi",
+                phone: "1-800-772-1213",
+                covered_expenses: "Cash - unrestricted use",
+                image_url: ""
+            },
+            {
+                resource_id: "FIN-NAT-0002",
+                resource_name: "ABLE Account",
+                organization_type: "Federal-State Program",
+                subcategories: "Savings Programs",
+                jurisdiction_level: "National",
+                short_description: "Tax-advantaged savings accounts that don't count against SSI asset limits. Save up to $18,000/year.",
+                amount_min_: 0,
+                amount_max_: 18000,
+                amount_type: "Annual",
+                income_limit_exists: "No",
+                age_min: 0,
+                age_max: 999,
+                eligibility_criteria: "Disability onset before age 26",
+                application_deadline: "Rolling",
+                website: "ablenrc.org",
+                covered_expenses: "Education, housing, transportation, healthcare, assistive technology",
+                image_url: ""
+            },
+            {
+                resource_id: "FIN-NAT-0003",
+                resource_name: "Katie Beckett/TEFRA Medicaid",
+                organization_type: "Federal-State Program",
+                subcategories: "Health Insurance",
+                jurisdiction_level: "Multi-State",
+                short_description: "Medicaid coverage for children with disabilities regardless of parent income. Available in 18 states + DC.",
+                amount_min_: 0,
+                amount_max_: 0,
+                income_limit_exists: "No",
+                income_limit_details: "Parent income waived - only child's income counts",
+                age_min: 0,
+                age_max: 18,
+                eligibility_criteria: "Child requires institutional level of care",
+                application_deadline: "Rolling",
+                website: "kidswaivers.org",
+                covered_expenses: "Medical care, therapies, equipment, prescriptions",
+                image_url: ""
+            },
+            {
+                resource_id: "FIN-NAT-0004",
+                resource_name: "IDEA Part C Early Intervention",
+                organization_type: "Federal Government",
+                subcategories: "Government Benefits",
+                jurisdiction_level: "National",
+                short_description: "FREE early intervention services for children birth to age 3. Down syndrome automatically qualifies.",
+                amount_min_: 0,
+                amount_max_: 0,
+                income_limit_exists: "No",
+                age_min: 0,
+                age_max: 3,
+                eligibility_criteria: "Down syndrome automatically qualifies",
+                application_deadline: "Rolling",
+                website: "sites.ed.gov/idea",
+                phone: "202-245-7459",
+                covered_expenses: "PT, OT, speech therapy, special instruction, family training",
+                image_url: ""
+            },
+            {
+                resource_id: "FIN-NAT-0005",
+                resource_name: "Ruby's Rainbow Scholarship",
+                organization_type: "Private Foundation",
+                subcategories: "Educational Scholarship",
+                jurisdiction_level: "National",
+                short_description: "Scholarships up to $10,000 for adults with Down syndrome pursuing post-secondary education.",
+                amount_min_: 1000,
+                amount_max_: 10000,
+                income_limit_exists: "No",
+                age_min: 18,
+                age_max: 999,
+                eligibility_criteria: "Must have Down syndrome; enrolled in post-secondary education",
+                application_deadline: "April 15",
+                website: "rubysrainbow.org",
+                phone: "866-766-7829",
+                covered_expenses: "Tuition, fees, books, housing/food if included",
+                image_url: ""
+            },
+            {
+                resource_id: "FIN-NAT-0006",
+                resource_name: "UnitedHealthcare Children's Foundation",
+                organization_type: "Corporate Foundation",
+                subcategories: "Medical/Therapy Grants",
+                jurisdiction_level: "National",
+                short_description: "Grants up to $5,000/year for medical expenses. Does NOT require UHC insurance.",
+                amount_min_: 500,
+                amount_max_: 5000,
+                income_limit_exists: "Yes",
+                income_limit_details: "$65k (family of 2) to $170k (family of 5+)",
+                age_min: 0,
+                age_max: 16,
+                eligibility_criteria: "Commercial health insurance required (NOT Medicaid primary)",
+                application_deadline: "Rolling",
+                website: "uhccf.org",
+                phone: "855-698-4223",
+                covered_expenses: "Therapy (PT/OT/speech), equipment, surgeries, prescriptions",
+                image_url: ""
+            },
+            {
+                resource_id: "FIN-NAT-0007",
+                resource_name: "GiGi's Playhouse Programs",
+                organization_type: "National Nonprofit",
+                subcategories: "Therapeutic Services",
+                jurisdiction_level: "National",
+                short_description: "100% FREE therapeutic and educational programs at 60+ locations nationwide.",
+                amount_min_: 0,
+                amount_max_: 0,
+                income_limit_exists: "No",
+                age_min: 0,
+                age_max: 999,
+                eligibility_criteria: "Down syndrome (priority) or developmental disabilities",
+                application_deadline: "Rolling",
+                website: "gigisplayhouse.org",
+                covered_expenses: "Speech therapy, literacy tutoring, math tutoring, fitness programs",
+                image_url: ""
+            },
+            {
+                resource_id: "FIN-NAT-0008",
+                resource_name: "First Hand Foundation",
+                organization_type: "Private Foundation",
+                subcategories: "Medical/Therapy Grants",
+                jurisdiction_level: "National",
+                short_description: "Medical grants up to $5,000 for uninsured or underinsured children.",
+                amount_min_: 500,
+                amount_max_: 5000,
+                income_limit_exists: "Yes",
+                income_limit_details: "$65k (1 child) + $15k per additional child, max $125k",
+                age_min: 0,
+                age_max: 18,
+                eligibility_criteria: "Uninsured or underinsured; under care of licensed provider",
+                application_deadline: "15th of each month",
+                website: "firsthandfoundation.org",
+                phone: "816-762-2044",
+                covered_expenses: "Medical treatment, therapy, medications, equipment",
+                image_url: ""
+            }
+        ];
+
+        const inspirationData = [
+            {
+                profile_id: "INS-0001",
+                full_name: "Charlie French",
+                known_as___stage_name: "Charlie French Fine Art",
+                location_city: "Boulder",
+                location_state: "CO",
+                primary_field: "Arts / Visual Arts",
+                secondary_fields: "Advocacy",
+                short_bio: "Abstract artist who creates joyful, colorful paintings with major brand collaborations including Michaels, Crayola, and Texas Rangers.",
+                specific_achievements: "Professional abstract artist with major brand collaborations including Michaels, Crayola, Texas Rangers. 132K+ Instagram followers.",
+                notable_quotes: "Let go, be free!",
+                speaking_available: "Yes",
+                active_since: "2017",
+                website: "charliefrenchfineart.com",
+                instagram: "https://instagram.com/charliefrenchfineart",
+                image_url: ""
+            },
+            {
+                profile_id: "INS-0002",
+                full_name: "John Lee Cronin",
+                known_as___stage_name: "John Cronin",
+                location_city: "Huntington",
+                location_state: "NY",
+                primary_field: "Entrepreneurship / Business",
+                secondary_fields: "Advocacy",
+                short_bio: "Co-founder of John's Crazy Socks, the world's largest sock store, generating over $6 million in revenue.",
+                specific_achievements: "Built John's Crazy Socks into a multi-million dollar business. Featured on Good Morning America, Forbes, and The Today Show.",
+                notable_quotes: "Crazy socks, crazy dreams!",
+                speaking_available: "Yes",
+                active_since: "2016",
+                website: "johnscrazysocks.com",
+                instagram: "https://instagram.com/johnscrazysocks",
+                image_url: ""
+            },
+            {
+                profile_id: "INS-0003",
+                full_name: "Madeline Stuart",
+                known_as___stage_name: "Madeline Stuart",
+                location_city: "Brisbane",
+                location_state: "QLD",
+                primary_field: "Modeling",
+                secondary_fields: "Advocacy",
+                short_bio: "World's first professional model with Down syndrome, walked runways at New York Fashion Week.",
+                specific_achievements: "First professional model with Down syndrome. Walked in NYFW multiple times. Featured in Vogue, Cosmopolitan, and global campaigns.",
+                speaking_available: "Yes",
+                active_since: "2015",
+                website: "madelinestuartmodel.com",
+                instagram: "https://instagram.com/maborama",
+                image_url: ""
+            },
+            {
+                profile_id: "INS-0004",
+                full_name: "Chris Nikic",
+                known_as___stage_name: "Chris Nikic",
+                location_city: "Orlando",
+                location_state: "FL",
+                primary_field: "Athletics / Sports",
+                secondary_fields: "Public Speaking",
+                short_bio: "First person with Down syndrome to complete an Ironman triathlon. Motivational speaker.",
+                specific_achievements: "Completed Ironman Florida 2020, making history as the first person with Down syndrome to finish an Ironman triathlon.",
+                notable_quotes: "1% better every day.",
+                speaking_available: "Yes",
+                active_since: "2020",
+                website: "chrisnikic.com",
+                instagram: "https://instagram.com/chrisnikic",
+                image_url: ""
+            },
+            {
+                profile_id: "INS-0005",
+                full_name: "Jamie Brewer",
+                known_as___stage_name: "Jamie Brewer",
+                location_city: "Los Angeles",
+                location_state: "CA",
+                primary_field: "Performing Arts / Theater",
+                secondary_fields: "Advocacy",
+                short_bio: "Award-winning actress known for American Horror Story. First woman with Down syndrome to walk NYFW.",
+                specific_achievements: "Starred in multiple seasons of American Horror Story. First woman with Down syndrome to walk at New York Fashion Week.",
+                speaking_available: "Yes",
+                active_since: "2011",
+                instagram: "https://instagram.com/jamiebrewer",
+                image_url: ""
+            },
+            {
+                profile_id: "INS-0006",
+                full_name: "Zack Gottsagen",
+                known_as___stage_name: "Zack Gottsagen",
+                location_city: "Palm Beach",
+                location_state: "FL",
+                primary_field: "Performing Arts / Theater",
+                secondary_fields: "Advocacy",
+                short_bio: "Actor and star of 'The Peanut Butter Falcon'. First person with Down syndrome to present at the Academy Awards.",
+                specific_achievements: "Starred in The Peanut Butter Falcon (2019). First person with Down syndrome to present at the Oscars.",
+                speaking_available: "Yes",
+                active_since: "2019",
+                instagram: "https://instagram.com/zikiboy808",
+                image_url: ""
+            }
+        ];
+
+        // State
+        let currentPage = 'home';
+        let currentDetailId = null;
+        let currentDetailType = null;
+        let sidebarCollapsed = true;
+        let filters = {
+            subcategory: [],
+            lifecycle: [],
+            jurisdiction: [],
+            income: [],
+            age: []
+        };
+        let inspirationFilters = {
+            field: [],
+            country: []
+        };
+
+        // Helpers
+        const normalizeField = (field) => {
+            const map = {
+                'Performing Arts / Theater': 'Performing Arts',
+                'Entrepreneurship / Business': 'Entrepreneur',
+                'Athletics / Sports': 'Athlete',
+                'Arts / Visual Arts': 'Artist',
+            };
+            return map[field] || field;
+        };
+
+        const getFieldColor = (field) => {
+            const colors = {
+                'Performing Arts': { bg: '#f3e8ff', text: '#7c3aed' },
+                'Entrepreneur': { bg: '#d1fae5', text: '#059669' },
+                'Athlete': { bg: '#ffedd5', text: '#ea580c' },
+                'Artist': { bg: '#e0e7ff', text: '#4f46e5' },
+                'Modeling': { bg: '#fce7f3', text: '#db2777' },
+            };
+            return colors[normalizeField(field)] || { bg: '#f3f4f6', text: '#374151' };
+        };
+
+        const formatAmount = (min, max) => {
+            if (!max && !min) return 'FREE';
+            if (max === 0) return 'FREE';
+            if (min === max) return `$${max.toLocaleString()}`;
+            return `$${(min || 0).toLocaleString()}–$${max.toLocaleString()}`;
+        };
+
+        const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
+
+        const navigate = (page, type = null, id = null) => {
+            currentPage = page;
+            currentDetailType = type;
+            currentDetailId = id;
+            render();
+            window.scrollTo(0, 0);
+        };
+
+        const toggleMenu = () => {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.getElementById('menuToggle');
+            if (menu) {
+                const isOpen = menu.classList.toggle('open');
+                if (toggle) {
+                    toggle.textContent = isOpen ? '✕' : '☰';
+                }
+            }
+        };
+
+        const closeMenu = () => {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.getElementById('menuToggle');
+            if (menu) {
+                menu.classList.remove('open');
+            }
+            if (toggle) {
+                toggle.textContent = '☰';
+            }
+        };
+
+        const toggleSidebar = () => {
+            sidebarCollapsed = !sidebarCollapsed;
+            render();
+        };
+
+        const expandSidebar = () => {
+            sidebarCollapsed = false;
+            render();
+        };
+
+        const toggleFilter = (category, value) => {
+            const idx = filters[category].indexOf(value);
+            if (idx > -1) {
+                filters[category].splice(idx, 1);
+            } else {
+                filters[category].push(value);
+            }
+            render();
+        };
+
+        const toggleInspirationFilter = (category, value) => {
+            const idx = inspirationFilters[category].indexOf(value);
+            if (idx > -1) {
+                inspirationFilters[category].splice(idx, 1);
+            } else {
+                inspirationFilters[category].push(value);
+            }
+            render();
+        };
+
+        const resetFilters = () => {
+            filters = { subcategory: [], lifecycle: [], jurisdiction: [], income: [], age: [] };
+            render();
+        };
+
+        const resetInspirationFilters = () => {
+            inspirationFilters = { field: [], country: [] };
+            render();
+        };
+
+        const hasActiveFilters = () => {
+            return Object.values(filters).some(arr => arr.length > 0);
+        };
+
+        const hasActiveInspirationFilters = () => {
+            return Object.values(inspirationFilters).some(arr => arr.length > 0);
+        };
+
+        const getFilteredResources = () => {
+            let results = [...resourcesData];
+            
+            if (filters.subcategory.length) {
+                results = results.filter(r => filters.subcategory.some(f => r.subcategories?.includes(f)));
+            }
+            if (filters.income.includes('no')) {
+                results = results.filter(r => r.income_limit_exists === 'No');
+            }
+            if (filters.income.includes('yes')) {
+                results = results.filter(r => r.income_limit_exists === 'Yes');
+            }
+            if (filters.jurisdiction.length) {
+                results = results.filter(r => filters.jurisdiction.includes(r.jurisdiction_level));
+            }
+            if (filters.age.length) {
+                results = results.filter(r => {
+                    return filters.age.some(ageRange => {
+                        if (ageRange === '0-3') return r.age_min <= 3 && r.age_max >= 0;
+                        if (ageRange === '3-5') return r.age_min <= 5 && r.age_max >= 3;
+                        if (ageRange === '5-18') return r.age_min <= 18 && r.age_max >= 5;
+                        if (ageRange === '18+') return r.age_max >= 18 || r.age_max === 999;
+                        return false;
+                    });
+                });
+            }
+            
+            return results;
+        };
+
+        const getFilteredInspiration = () => {
+            let results = [...inspirationData];
+            
+            if (inspirationFilters.field.length) {
+                results = results.filter(p => {
+                    const normalizedField = normalizeField(p.primary_field);
+                    return inspirationFilters.field.includes(normalizedField);
+                });
+            }
+            if (inspirationFilters.country.length) {
+                results = results.filter(p => {
+                    const country = p.location_state === 'QLD' ? 'Australia' : 'United States';
+                    return inspirationFilters.country.includes(country);
+                });
+            }
+            
+            return results;
+        };
+
+        // Render functions
+        const renderHeader = () => `
+            <header>
+                <div class="header-content">
+                    <a href="#" class="logo" onclick="navigate('home'); return false;">T21</a>
+                    <nav>
+                        <a href="#" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); return false;">Home</a>
+                        <a href="#" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); return false;">Resources</a>
+                        <a href="#" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); return false;">Inspiration</a>
+                        <a href="#" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); return false;">About</a>
+                        <a href="#">Contact</a>
+                        <a href="#">Give</a>
+                        <a href="#">Submit</a>
+                    </nav>
+                    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+                </div>
+            </header>
+            <div class="mobile-menu-overlay" id="mobileMenu">
+                <a href="#" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); closeMenu(); return false;">Home</a>
+                <a href="#" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); closeMenu(); return false;">Resources</a>
+                <a href="#" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); closeMenu(); return false;">Inspiration</a>
+                <a href="#" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); closeMenu(); return false;">About</a>
+                <a href="#" onclick="closeMenu();">Contact</a>
+                <a href="#" onclick="closeMenu();">Give</a>
+                <a href="#" onclick="closeMenu();">Submit</a>
+            </div>
+        `;
+
+        const renderSidebar = (type = 'resources') => `
+            <div class="sidebar ${sidebarCollapsed ? 'collapsed' : ''}">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Filters</span>
+                    <button class="sidebar-toggle-btn" onclick="toggleSidebar()">‹</button>
+                </div>
+                
+                ${type === 'resources' ? `
+                <button class="reset-filters-btn ${hasActiveFilters() ? 'active' : ''}" onclick="resetFilters()">
+                    ${hasActiveFilters() ? 'Reset Filters' : 'No Filters Applied'}
+                </button>
+                
+                <div class="facet">
+                    <div class="facet-title">Category</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Category">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Government Benefits') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Government Benefits')"> Government Benefits</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Health Insurance') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Health Insurance')"> Health Insurance</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Educational Scholarship') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Educational Scholarship')"> Educational Scholarship</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Medical/Therapy Grants') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Medical/Therapy Grants')"> Medical/Therapy Grants</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Savings Programs') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Savings Programs')"> Savings Programs</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Therapeutic Services') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Therapeutic Services')"> Therapeutic Services</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Age Range</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Age Range">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('0-3') ? 'checked' : ''} onchange="toggleFilter('age', '0-3')"> Birth–3</label>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('3-5') ? 'checked' : ''} onchange="toggleFilter('age', '3-5')"> 3–5 Years</label>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('5-18') ? 'checked' : ''} onchange="toggleFilter('age', '5-18')"> 5–18 Years</label>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('18+') ? 'checked' : ''} onchange="toggleFilter('age', '18+')"> 18+</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Coverage</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Coverage">
+                        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.jurisdiction.includes('National') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'National')"> National</label>
+                    <label class="filter"><input type="checkbox" ${filters.jurisdiction.includes('Multi-State') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'Multi-State')"> Multi-State</label>
+                    <label class="filter"><input type="checkbox" ${filters.jurisdiction.includes('State') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'State')"> State</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Income Limits</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Income Limits">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.income.includes('no') ? 'checked' : ''} onchange="toggleFilter('income', 'no')"> No Limits</label>
+                    <label class="filter"><input type="checkbox" ${filters.income.includes('yes') ? 'checked' : ''} onchange="toggleFilter('income', 'yes')"> Has Limits</label>
+                </div>
+                ` : `
+                <button class="reset-filters-btn ${hasActiveInspirationFilters() ? 'active' : ''}" onclick="resetInspirationFilters()">
+                    ${hasActiveInspirationFilters() ? 'Reset Filters' : 'No Filters Applied'}
+                </button>
+                
+                <div class="facet">
+                    <div class="facet-title">Field</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Field">
+                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Artist') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Artist')"> Artist</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Athlete') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Athlete')"> Athlete</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Entrepreneur') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Entrepreneur')"> Entrepreneur</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Modeling') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Modeling')"> Modeling</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Performing Arts') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Performing Arts')"> Performing Arts</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Country</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Country">
+                        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.country.includes('Australia') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'Australia')"> Australia</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.country.includes('United States') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'United States')"> United States</label>
+                </div>
+                `}
+            </div>
+        `;
+
+        const renderFooter = () => `
+            <footer>
+                <div class="footer-content">
+                    <span class="footer-text">© 2026 T21 Directory. All rights reserved.</span>
+                    <span class="footer-text">Made with ❤️ for the DS community</span>
+                </div>
+            </footer>
+        `;
+
+        const renderHomePage = () => `
+            <div class="home-hero">
+                <div class="home-hero-content">
+                    <h1>Resources for the Down Syndrome Community</h1>
+                    <p>A comprehensive directory of financial resources, benefits, grants, and inspiring individuals. Built by the community, for the community.</p>
+                    <div class="home-hero-buttons">
+                        <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Browse Resources →</a>
+                        <a href="#" class="btn btn-secondary-light" onclick="navigate('inspiration'); return false;">Meet Inspiring Individuals →</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="home-stats">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: var(--color-primary);">
+                        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                    <div class="stat-value">202</div>
+                    <div class="stat-label">Financial Resources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: var(--color-secondary);">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <div class="stat-value">95</div>
+                    <div class="stat-label">Inspiring Individuals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: var(--color-tertiary);">
+                        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </div>
+                    <div class="stat-value">50</div>
+                    <div class="stat-label">States Covered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #8b5cf6;">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div class="stat-value">45+</div>
+                    <div class="stat-label">No Income Limits</div>
+                </div>
+            </div>
+            
+            <div class="home-section">
+                <div class="home-section-header">
+                    <h2>Explore the Directory</h2>
+                    <p>Find the support you need, from financial assistance to inspiring role models.</p>
+                </div>
+                <div class="home-cards">
+                    <a href="#" class="home-card blue" onclick="navigate('resources'); return false;">
+                        <div class="home-card-content">
+                            <div class="home-card-icon" style="background: var(--color-primary);">
+                                <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            </div>
+                            <h3>Financial Resources</h3>
+                            <p>Discover 202+ grants, benefits, scholarships, and support programs for the Down syndrome community.</p>
+                            <div class="home-card-tags">
+                                <span class="home-card-tag">Government Benefits</span>
+                                <span class="home-card-tag">Grants</span>
+                                <span class="home-card-tag">Scholarships</span>
+                            </div>
+                            <span class="home-card-link">Browse Resources →</span>
+                        </div>
+                    </a>
+                    <a href="#" class="home-card teal" onclick="navigate('inspiration'); return false;">
+                        <div class="home-card-content">
+                            <div class="home-card-icon" style="background: var(--color-secondary);">
+                                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </div>
+                            <h3>Inspiring Individuals</h3>
+                            <p>Meet 95+ role models making an impact — athletes, artists, entrepreneurs, advocates, and creators.</p>
+                            <div class="home-card-tags">
+                                <span class="home-card-tag">Athletes</span>
+                                <span class="home-card-tag">Artists</span>
+                                <span class="home-card-tag">Entrepreneurs</span>
+                            </div>
+                            <span class="home-card-link">Meet Inspiring Individuals →</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        `;
+
+        const renderResourcesPage = () => {
+            const filtered = getFilteredResources();
+            return `
+                <div class="main-wrapper">
+                    ${renderSidebar('resources')}
+                    <div class="content">
+                        <div class="page-header">
+                            <h1 class="page-title">Financial Resources</h1>
+                            <p class="page-subtitle">Grants, benefits, scholarships, and support programs for the Down syndrome community.</p>
+                        </div>
+                        
+                        <div class="results-header">
+                            <span class="results-count">Showing ${filtered.length} resources</span>
+                            <div class="sort-controls">
+                                <label>Sort by:</label>
+                                <select>
+                                    <option>Relevance</option>
+                                    <option>Amount (High to Low)</option>
+                                    <option>Amount (Low to High)</option>
+                                    <option>Name (A-Z)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        ${filtered.map(r => `
+                            <div class="card" onclick="navigate('detail', 'resource', '${r.resource_id}')">
+                                <div class="card-image">${r.image_url ? `<img src="${r.image_url}" alt="">` : 'Image'}</div>
+                                <div class="card-body">
+                                    <div class="card-title">${r.resource_name}</div>
+                                    <div class="card-org">${r.organization_type}</div>
+                                    <div class="card-desc">${r.short_description || ''}</div>
+                                    <div class="card-tags">
+                                        <span class="card-tag">${r.subcategories}</span>
+                                        <span class="card-tag">${r.jurisdiction_level}</span>
+                                        ${r.income_limit_exists === 'No' ? '<span class="card-tag highlight">No Income Limits</span>' : ''}
+                                    </div>
+                                </div>
+                                <div class="card-amount">
+                                    <span class="card-amount-label">Award</span>
+                                    <span class="card-amount-value">${formatAmount(r.amount_min_, r.amount_max_)}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                        
+                        <button class="load-more-btn">LOAD MORE</button>
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderInspirationPage = () => {
+            const filtered = getFilteredInspiration();
+            return `
+            <div class="main-wrapper">
+                ${renderSidebar('inspiration')}
+                <div class="content">
+                    <div class="page-header">
+                        <h1 class="page-title">Inspiring Individuals</h1>
+                        <p class="page-subtitle">Meet role models making an impact — athletes, artists, entrepreneurs, advocates, and more.</p>
+                    </div>
+                    
+                    <div class="results-header">
+                        <span class="results-count">Showing ${filtered.length} individuals</span>
+                        <div class="sort-controls">
+                            <label>Sort by:</label>
+                            <select>
+                                <option>Name (A-Z)</option>
+                                <option>Field</option>
+                                <option>Location</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="inspiration-grid">
+                        ${filtered.map(p => {
+                            const fieldColor = getFieldColor(p.primary_field);
+                            return `
+                                <div class="inspiration-card" onclick="navigate('detail', 'inspiration', '${p.profile_id}')">
+                                    <div class="inspiration-card-header" ${p.image_url ? `style="background-image: url('${p.image_url}'); background-size: cover;"` : ''}>
+                                        <div class="inspiration-avatar">${getInitials(p.full_name)}</div>
+                                        <div class="inspiration-card-header-text">
+                                            <div class="inspiration-name">${p.known_as___stage_name || p.full_name}</div>
+                                            <div class="inspiration-location">${[p.location_city, p.location_state].filter(Boolean).join(', ')}</div>
+                                        </div>
+                                    </div>
+                                    <div class="inspiration-card-body">
+                                        <span class="inspiration-field-badge" style="background: ${fieldColor.bg}; color: ${fieldColor.text};">${normalizeField(p.primary_field)}</span>
+                                        <p class="inspiration-bio">${p.short_bio || ''}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <button class="load-more-btn">LOAD MORE</button>
+                </div>
+            </div>
+        `;
+        };
+
+        const renderResourceDetail = () => {
+            const r = resourcesData.find(res => res.resource_id === currentDetailId);
+            if (!r) return '<div>Not found</div>';
+            
+            return `
+                <div class="detail-page">
+                    <div class="detail-back-bar">
+                        <div class="detail-back-bar-content">
+                            <a href="#" class="back-link" onclick="navigate('resources'); return false;">← Back to Resources</a>
+                        </div>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-image-banner">
+                            ${r.image_url ? `<img src="${r.image_url}" alt="${r.resource_name}">` : ''}
+                        </div>
+                        
+                        <h1 class="detail-title">${r.resource_name}</h1>
+                        <p class="detail-org">${r.organization_type}</p>
+                        
+                        <div class="detail-amount-box">
+                            <div class="detail-amount-label">${r.amount_type || 'Award'}</div>
+                            <div class="detail-amount-value">
+                                ${formatAmount(r.amount_min_, r.amount_max_)}
+                                ${r.amount_type === 'Monthly' ? '<span class="detail-amount-suffix">/mo</span>' : ''}
+                            </div>
+                            ${r.annual_cap_ ? `<div style="font-size: 0.85rem; color: var(--color-gray-text); margin-top: 0.25rem;">Up to $${r.annual_cap_.toLocaleString()}/year</div>` : ''}
+                        </div>
+                        
+                        <div class="detail-tags">
+                            <span class="detail-tag">${r.subcategories}</span>
+                            <span class="detail-tag">${r.jurisdiction_level}</span>
+                            ${r.income_limit_exists === 'No' ? '<span class="detail-tag green">No Income Limits</span>' : ''}
+                        </div>
+                        
+                        <div class="detail-description">
+                            ${r.full_description ? r.full_description.split('\n\n').map(p => `<p>${p}</p>`).join('') : (r.short_description ? `<p>${r.short_description}</p>` : '')}
+                        </div>
+                        
+                        <div class="detail-actions">
+                            ${r.website ? `<a href="https://${r.website}" target="_blank" class="btn btn-primary">Visit Website →</a>` : ''}
+                            ${r.phone ? `<a href="tel:${r.phone}" class="btn btn-secondary">📞 ${r.phone}</a>` : ''}
+                        </div>
+                        
+                        ${r.key_features ? `
+                            <div class="detail-section">
+                                <h2 class="detail-section-title">Key Features</h2>
+                                <div class="detail-description">
+                                    <p style="white-space: pre-line;">${r.key_features}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="detail-section">
+                            <h2 class="detail-section-title">Eligibility & Details</h2>
+                            <div class="detail-grid">
+                                <div class="detail-grid-item">
+                                    <label>Age Range</label>
+                                    <span>${r.age_min === 0 ? 'Birth' : r.age_min} – ${r.age_max === 999 ? 'All ages' : r.age_max + ' years'}</span>
+                                </div>
+                                <div class="detail-grid-item">
+                                    <label>Application Deadline</label>
+                                    <span>${r.application_deadline || 'Rolling'}</span>
+                                </div>
+                                <div class="detail-grid-item">
+                                    <label>Income Limits</label>
+                                    <span>${r.income_limit_exists === 'No' ? 'None' : (r.income_limit_details || 'Yes - see details')}</span>
+                                </div>
+                                ${r.phone ? `
+                                    <div class="detail-grid-item">
+                                        <label>Phone</label>
+                                        <span>${r.phone}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            ${r.eligibility_criteria ? `
+                                <div class="detail-info-item">
+                                    <label>Eligibility Requirements</label>
+                                    <span>${r.eligibility_criteria}</span>
+                                </div>
+                            ` : ''}
+                            
+                            ${r.covered_expenses ? `
+                                <div class="detail-info-item">
+                                    <label>Covered Expenses</label>
+                                    <span>${r.covered_expenses}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${r.practical_notes ? `
+                            <div class="detail-note-card">
+                                <h3>💡 Important Notes</h3>
+                                ${r.practical_notes.split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderInspirationDetail = () => {
+            const p = inspirationData.find(prof => prof.profile_id === currentDetailId);
+            if (!p) return '<div>Not found</div>';
+            
+            const fieldColor = getFieldColor(p.primary_field);
+            const displayName = p.known_as___stage_name || p.full_name;
+            const location = [p.location_city, p.location_state].filter(Boolean).join(', ');
+            
+            return `
+                <div class="detail-page">
+                    <div class="detail-back-bar">
+                        <div class="detail-back-bar-content">
+                            <a href="#" class="back-link" onclick="navigate('inspiration'); return false;">← Back to Inspiration</a>
+                        </div>
+                    </div>
+                    <div class="detail-content">
+                        <div class="inspiration-detail-header">
+                            <div class="inspiration-detail-banner">
+                                ${p.image_url ? `<img src="${p.image_url}" alt="${displayName}">` : ''}
+                            </div>
+                            <div class="inspiration-detail-profile">
+                                <div class="inspiration-detail-avatar">${getInitials(p.full_name)}</div>
+                                <h1 class="inspiration-detail-name">${displayName}</h1>
+                                ${p.known_as___stage_name && p.full_name !== p.known_as___stage_name ? `<p class="inspiration-detail-subname">${p.full_name}</p>` : ''}
+                                
+                                <div class="inspiration-detail-meta">
+                                    ${location ? `<span>📍 ${location}</span>` : ''}
+                                    ${p.active_since ? `<span>📅 Active since ${p.active_since}</span>` : ''}
+                                </div>
+                                
+                                <div class="inspiration-detail-links">
+                                    ${p.website ? `<a href="https://${p.website}" target="_blank" class="social-link">🌐 Website</a>` : ''}
+                                    ${p.instagram ? `<a href="${p.instagram}" target="_blank" class="social-link">📷 Instagram</a>` : ''}
+                                </div>
+                                
+                                <div class="inspiration-detail-badges">
+                                    <span class="inspiration-badge" style="background: ${fieldColor.bg}; color: ${fieldColor.text};">${normalizeField(p.primary_field)}</span>
+                                    ${p.secondary_fields ? `<span class="inspiration-badge" style="background: var(--color-gray-light); color: var(--color-gray-dark);">${p.secondary_fields}</span>` : ''}
+                                    ${p.speaking_available === 'Yes' ? `<span class="inspiration-badge" style="background: #d1fae5; color: #059669;">🎤 Available for Speaking</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${p.short_bio ? `
+                            <div class="detail-section">
+                                <h2 class="detail-section-title">About</h2>
+                                <div class="detail-description">
+                                    <p>${p.short_bio}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${p.specific_achievements ? `
+                            <div class="detail-section">
+                                <h2 class="detail-section-title">Achievements</h2>
+                                <div class="detail-description">
+                                    <p>${p.specific_achievements}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${p.notable_quotes ? `
+                            <div class="quote-card">
+                                <blockquote>"${p.notable_quotes}"</blockquote>
+                                <cite>— ${displayName}</cite>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderAboutPage = () => `
+            <div class="about-page">
+                <div class="about-hero">
+                    <div class="about-hero-content">
+                        <h1>Building an Operating System for Thriving</h1>
+                        <p>Every family raising a child with Down syndrome deserves a roadmap — not just to survive, but to truly thrive.</p>
+                    </div>
+                </div>
+                
+                <div class="about-content">
+                    <div class="about-section">
+                        <h2>The Challenge</h2>
+                        <p>When you become a parent to a child with Down syndrome, you quickly realize that love isn't enough. You need to become an advocate, a researcher, a benefits specialist, an IEP negotiator, a therapy coordinator, and so much more — often all before your morning coffee.</p>
+                        <p>Finding the right therapists. Understanding SSI and Medicaid waivers. Navigating the school system. Discovering inclusive sports programs. Connecting with other families who get it. Each of these is its own full-time job, and there's no single place to find what you need.</p>
+                        <p>For families who travel frequently, the challenge multiplies. Resources vary by state. Programs have different eligibility requirements. What works in one city may not exist in another.</p>
+                    </div>
+                    
+                    <div class="about-section">
+                        <h2>The Vision</h2>
+                        <p>T21 is more than a directory — it's an operating system for families. A framework for building a wonderful life where your child with Down syndrome can reach their full potential, and your entire family can thrive together.</p>
+                        <p>We believe that access to information shouldn't depend on how many Facebook groups you've joined, which parent advocates you happen to know, or how many hours you can spend researching. Every family deserves to know about the $50+ billion in annual funding available, the free therapy programs, the inclusive schools, and the inspiring role models who prove what's possible.</p>
+                        
+                        <div class="about-pillars">
+                            <div class="about-pillar">
+                                <div class="about-pillar-icon" style="background: var(--color-primary);">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                </div>
+                                <h3>Financial Foundation</h3>
+                                <p>Navigate benefits, grants, and scholarships that can provide hundreds of thousands of dollars in support over your child's lifetime.</p>
+                            </div>
+                            <div class="about-pillar">
+                                <div class="about-pillar-icon" style="background: var(--color-secondary);">
+                                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                </div>
+                                <h3>Community & Inspiration</h3>
+                                <p>Connect with role models, advocates, and families who show what's possible and remind us we're not alone on this journey.</p>
+                            </div>
+                            <div class="about-pillar">
+                                <div class="about-pillar-icon" style="background: var(--color-tertiary);">
+                                    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                                </div>
+                                <h3>Knowledge & Advocacy</h3>
+                                <p>Arm yourself with the information you need to advocate effectively — at school, with healthcare providers, and in your community.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-section about-personal">
+                        <div class="about-personal-content">
+                            <h2>Our Story</h2>
+                            <p>T21 was born from our own family's journey. We have two boys — ages 9 and 6. Our younger son has Down syndrome, and from the moment of his diagnosis, we dove headfirst into learning everything we could to give him the best possible life.</p>
+                            <p>We've spent countless hours researching therapies, applying for benefits, advocating at our amazing public school, finding inclusive recreational activities, and connecting with other families. It's nearly a full-time job on top of our actual full-time jobs — and we're lucky to have the time and resources to do it.</p>
+                            <p>But we kept thinking: what about families who don't have these advantages? What about the single parent working two jobs? The family in a rural area without a local Down syndrome association? The parents who don't know that their child automatically qualifies for SSI, or that early intervention services are free and federally guaranteed?</p>
+                            <p>We travel frequently as a family, and we've seen firsthand how resources vary dramatically from place to place. We wanted to build the tool we wished existed — a comprehensive, searchable, always-updated directory that any family could use to find the support they need, wherever they are.</p>
+                            <p>That's T21. And we're just getting started.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="about-section about-cta">
+                        <h2>Join Us</h2>
+                        <p>T21 is a community effort. We're building this directory together — parents, advocates, organizations, and allies who believe every family deserves access to the resources that can change lives.</p>
+                        <div class="about-cta-buttons">
+                            <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Explore Resources →</a>
+                            <a href="#" class="btn btn-secondary">Submit a Resource</a>
+                            <a href="#" class="btn btn-secondary">Get Involved</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ${renderFooter()}
+        `;
+
+        // Main render
+        const render = () => {
+            let content = '';
+            
+            if (currentPage === 'detail') {
+                if (currentDetailType === 'resource') {
+                    content = renderResourceDetail();
+                } else {
+                    content = renderInspirationDetail();
+                }
+            } else if (currentPage === 'resources') {
+                content = renderResourcesPage();
+            } else if (currentPage === 'inspiration') {
+                content = renderInspirationPage();
+            } else if (currentPage === 'about') {
+                content = renderAboutPage();
+            } else {
+                content = renderHomePage();
+            }
+            
+            document.getElementById('app').innerHTML = `
+                ${renderHeader()}
+                ${(currentPage === 'home' || currentPage === 'about') ? `<main style="margin-top: 70px;">${content}</main>` : content}
+            `;
+        };
+
+        render();
+    </script>
+</body>
+</html>
