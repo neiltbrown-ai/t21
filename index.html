@@ -354,6 +354,49 @@
             color: var(--color-gray-text);
         }
 
+        .search-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.85rem 1.25rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            border: 1px solid var(--color-gray-border);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-btn {
+            padding: 0.85rem 1.5rem;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover {
+            background: #0052a3;
+        }
+
         .results-header {
             display: flex;
             justify-content: space-between;
@@ -1624,10 +1667,10 @@
                 "cost_type": "Medicaid/Waiver",
                 "cost_details": "",
                 "application_status": "Open - Rolling",
-                "short_description": "Ruby's Rainbow is the premier scholarship organization exclusively for individuals with Down syndrome pursuing post-secondary education. Since 2016, the organization has distributed over $3.77 million...",
-                "full_description": "Ruby's Rainbow is the premier scholarship organization exclusively for individuals with Down syndrome pursuing post-secondary education. Since 2016, the organization has distributed over $3.77 million to more than 1,015 scholars, making it the largest and most impactful educational funding source for people with Down syndrome in the United States.\n\nAwards range from $1,000 to $10,000 based on financial need, educational goals, and application strength. The program's revolutionary flexibility recognizes diverse educational paths: traditional college, community college, vocational programs, certificate courses, Comprehensive Transition Programs, or continuing education\u2014all are equally valid and fundable.\n\nFounded in memory of Ruby Casto, who dreamed of attending college, the organization has transformed post-secondary education from an impossible dream to an achievable reality for thousands of young adults with Down syndrome.",
-                "key_features": "\u2022 $1,000-$10,000 AWARDS: Based on need and program costs\n\u2022 NO INCOME LIMITS: Available to all families regardless of earnings\n\u2022 BROAD PROGRAM ELIGIBILITY: College, vocational, certificate, CTP, continuing ed all qualify\n\u2022 REAPPLY ANNUALLY: Can receive funding multiple years\n\u2022 COVERS TUITION + BOOKS: Up to 10% can go to textbooks and materials\n\u2022 HOUSING IF REQUIRED: Room/board covered only if mandatory part of tuition package\n\u2022 60%+ FUNDING RATE: Strong chance of receiving award\n\u2022 $3.77M+ DISTRIBUTED: Track record of substantial support since 2016\n\u2022 1,015+ SCHOLARS: Large community of funded students\n\u2022 NATIONAL SCOPE: Available in all 50 states\n\u2022 FLEXIBLE ESSAY: Multiple formats accepted; assistance allowed\n\u2022 NO GPA REQUIREMENT: Academic performance not a barrier",
-                "practical_notes": "Before Ruby's Rainbow, financial aid for students with intellectual disabilities was nearly non-existent. Traditional scholarships require SAT/ACT scores, minimum GPAs, and degree-seeking enrollment\u2014all barriers for students with Down syndrome. Ruby's Rainbow eliminated these obstacles.\n\nApplication tips: Start early (January), be specific about educational goals, let the applicant's voice come through, choose recommenders who know the applicant well, don't be intimidated by financial need section, apply every year.",
+                "short_description": "The Katie Beckett/TEFRA program is a Medicaid option that disregards parental income when determining a child's eligibility for Medicaid. This is transformative for middle and upper-income families wh...",
+                "full_description": "The Katie Beckett/TEFRA program is a Medicaid option that disregards parental income when determining a child's eligibility for Medicaid. This is transformative for middle and upper-income families whose children have significant medical or developmental needs but who don't qualify for traditional Medicaid due to parent earnings.\n\nNamed after Katie Beckett, whose situation in 1981 revealed a policy inequity (children in institutions got Medicaid regardless of parent income, but identical children at home were denied), this program allows children requiring institutional-level care to receive Medicaid while living at home, counting only the child's own income (typically $0).\n\nAvailable in 18 states plus DC, this program has no waitlist and is an entitlement, making it crucial for families earning $75,000-$200,000+ who face substantial medical costs that insurance doesn't fully cover.",
+                "key_features": "\u2022 PARENT INCOME WAIVED: Only child's income/assets count (usually $0)\n\u2022 NO WAITLIST: Entitlement program unlike most HCBS waivers\n\u2022 FULL MEDICAID BENEFITS: Complete coverage including unlimited therapy\n\u2022 AGES BIRTH-18: Available throughout childhood\n\u2022 INSTITUTIONAL LEVEL OF CARE: Criteria most children with DS meet\n\u2022 STATE-SPECIFIC NAMES: Called Katie Beckett, TEFRA, or state-specific names\n\u2022 COMPREHENSIVE SERVICES: Medical, dental, therapy, equipment, prescriptions, hospital\n\u2022 NO COST SHARING: No copays, deductibles, or out-of-pocket costs\n\u2022 RETROACTIVE COVERAGE: May cover bills from up to 3 months before application\n\u2022 SECONDARY INSURANCE: Can coordinate with private insurance",
+                "practical_notes": "Katie Beckett/TEFRA is the single most important program for middle and upper-income families with children with Down syndrome. A family earning $150,000 annually can have their child receive full Medicaid benefits, accessing unlimited therapy, medical equipment, and healthcare without depleting savings.\n\nMany families don't realize they qualify or are intimidated by the \"institutional level of care\" language. This doesn't mean your child needs to be severely disabled or medically fragile. It means they need services comparable to what would be provided in a facility setting. Most children with Down syndrome meet this through therapy needs alone\u2014speech therapy 2-3x weekly, OT weekly, PT weekly, plus developmental services easily constitutes institutional-level support.\n\nUnfortunately, only 18 states plus DC currently offer this program. If your state doesn't participate, advocate for its adoption. Contact state legislators, disability advocacy organizations, and Medicaid offices to request implementation. Several states have added Katie Beckett in recent years following parent advocacy campaigns.\n\nFor families in participating states who were previously denied traditional Medicaid due to income, this program is life-changing. The annual value of unlimited therapy and medical coverage can easily exceed $30,000-$50,000, far more than most families could afford to pay out-of-pocket.",
                 "date_added": "2026-01-26",
                 "last_verified": "2026-01-01",
                 "verification_source": "Migration from v1 database",
@@ -1690,10 +1733,10 @@
                 "cost_type": "Free",
                 "cost_details": "",
                 "application_status": "Open - Deadline",
-                "short_description": "UnitedHealthcare Children's Foundation (UHCCF) is one of the most accessible major grant programs for medical expenses not fully covered by insurance. Since 1998, the foundation has distributed over $...",
-                "full_description": "UnitedHealthcare Children's Foundation (UHCCF) is one of the most accessible major grant programs for medical expenses not fully covered by insurance. Since 1998, the foundation has distributed over $70 million to more than 35,000 children with various medical conditions including Down syndrome.\n\nThe critical and often misunderstood fact: families do NOT need UnitedHealthcare insurance to qualify. Any commercial (private) health insurance meets the requirement\u2014employer plans, marketplace plans, or individual policies from any carrier.\n\nGrants range from $500 to $5,000 per calendar year with a lifetime maximum of $10,000, filling the gap for families facing high deductibles, limited therapy caps, or services insurance simply doesn't cover.",
-                "key_features": "\u2022 ANY INSURANCE ACCEPTED: Don't need UnitedHealthcare specifically\n\u2022 $5,000 ANNUAL GRANT: Substantial assistance per year\n\u2022 $10,000 LIFETIME MAX: Can receive funding over multiple years\n\u2022 MIDDLE-INCOME FRIENDLY: Income limits reach $170,000 for larger families\n\u2022 COVERS THERAPY: PT, OT, speech after insurance caps exhausted\n\u2022 COVERS EQUIPMENT: Wheelchairs, orthotics, communication devices, adaptive equipment\n\u2022 COVERS MEDICAL: Surgeries, procedures, prescriptions\n\u2022 ABA THERAPY: One-time funding for ages 3-6 (limited scope but available)\n\u2022 YEAR-ROUND APPLICATIONS: No deadline; rolling acceptance\n\u2022 DIRECT PAYMENT: Funds go to providers, simplifying process\n\u2022 70% APPROVAL RATE: Strong odds with good documentation\n\u2022 SECONDARY MEDICAID OK: Having Medicaid as secondary insurance doesn't disqualify",
-                "practical_notes": "UHCCF is dramatically underutilized because families think they need UnitedHealthcare insurance (false) or assume having insurance disqualifies them (false).\n\nEven families with \"good\" insurance face substantial out-of-pocket costs. A therapy cap of 30 visits per year sounds reasonable until your child needs weekly speech therapy (52 visits). After hitting the cap in July, families face $150-200 per session out-of-pocket for the rest of the year\u2014$3,000-4,000+ in uncovered costs. UHCCF fills this exact gap.\n\nThe $170,000 income limit for larger families is surprisingly generous. A two-parent household with three kids earning $100,000 qualifies\u2014this includes many solidly middle-class families.",
+                "short_description": "Ruby's Rainbow is the premier scholarship organization exclusively for individuals with Down syndrome pursuing post-secondary education. Since 2016, the organization has distributed over $3.77 million...",
+                "full_description": "Ruby's Rainbow is the premier scholarship organization exclusively for individuals with Down syndrome pursuing post-secondary education. Since 2016, the organization has distributed over $3.77 million to more than 1,015 scholars, making it the largest and most impactful educational funding source for people with Down syndrome in the United States.\n\nAwards range from $1,000 to $10,000 based on financial need, educational goals, and application strength. The program's revolutionary flexibility recognizes diverse educational paths: traditional college, community college, vocational programs, certificate courses, Comprehensive Transition Programs, or continuing education\u2014all are equally valid and fundable.\n\nFounded in memory of Ruby Casto, who dreamed of attending college, the organization has transformed post-secondary education from an impossible dream to an achievable reality for thousands of young adults with Down syndrome.",
+                "key_features": "\u2022 $1,000-$10,000 AWARDS: Based on need and program costs\n\u2022 NO INCOME LIMITS: Available to all families regardless of earnings\n\u2022 BROAD PROGRAM ELIGIBILITY: College, vocational, certificate, CTP, continuing ed all qualify\n\u2022 REAPPLY ANNUALLY: Can receive funding multiple years\n\u2022 COVERS TUITION + BOOKS: Up to 10% can go to textbooks and materials\n\u2022 HOUSING IF REQUIRED: Room/board covered only if mandatory part of tuition package\n\u2022 60%+ FUNDING RATE: Strong chance of receiving award\n\u2022 $3.77M+ DISTRIBUTED: Track record of substantial support since 2016\n\u2022 1,015+ SCHOLARS: Large community of funded students\n\u2022 NATIONAL SCOPE: Available in all 50 states\n\u2022 FLEXIBLE ESSAY: Multiple formats accepted; assistance allowed\n\u2022 NO GPA REQUIREMENT: Academic performance not a barrier",
+                "practical_notes": "Before Ruby's Rainbow, financial aid for students with intellectual disabilities was nearly non-existent. Traditional scholarships require SAT/ACT scores, minimum GPAs, and degree-seeking enrollment\u2014all barriers for students with Down syndrome. Ruby's Rainbow eliminated these obstacles.\n\nApplication tips: Start early (January), be specific about educational goals, let the applicant's voice come through, choose recommenders who know the applicant well, don't be intimidated by financial need section, apply every year.",
                 "date_added": "2026-01-26",
                 "last_verified": "2026-01-01",
                 "verification_source": "Migration from v1 database",
@@ -1723,10 +1766,10 @@
                 "cost_type": "Free",
                 "cost_details": "",
                 "application_status": "Open - Rolling",
-                "short_description": "First Hand Foundation provides medical grants to children who are uninsured or underinsured, complementing programs like UHCCF that require commercial insurance. Since 2004, the foundation has distrib...",
-                "full_description": "First Hand Foundation provides medical grants to children who are uninsured or underinsured, complementing programs like UHCCF that require commercial insurance. Since 2004, the foundation has distributed over $20 million to children with medical conditions across all 50 states.\n\nThe key distinction: First Hand specifically serves families who lack adequate insurance coverage\u2014those with no insurance at all, high-deductible plans that make care unaffordable, limited benefits that exclude necessary services, or those who recently lost coverage.\n\nGrants range from $500 to $5,000 with no stated lifetime maximum, and families can reapply every 12 months as long as they continue to meet eligibility criteria.",
-                "key_features": "\u2022 SERVES UNINSURED: Primary focus on families without insurance\n\u2022 UNDERINSURED ACCEPTED: Also helps those with inadequate coverage\n\u2022 REAPPLY ANNUALLY: No lifetime cap; can receive grants multiple years\n\u2022 $500-$5,000 GRANTS: Meaningful assistance for medical costs\n\u2022 BROAD EXPENSE COVERAGE: Medical, therapy, medications, equipment, vehicle modifications, travel\n\u2022 MONTHLY CYCLES: Applications reviewed every month\n\u2022 30-DAY DECISIONS: Relatively quick turnaround\n\u2022 $20M+ DISTRIBUTED: Proven track record since 2004\n\u2022 ALL 50 STATES: Nationwide availability\n\u2022 VEHICLE MODIFICATIONS: Unique coverage for accessibility needs\n\u2022 MEDICAL TRAVEL: Covers gas, hotels, meals for specialty care",
-                "practical_notes": "First Hand Foundation fills a critical gap for families who fall between Medicaid (too high income) and commercial insurance (can't afford or recently lost coverage).\n\nFor families affected by Down syndrome, First Hand commonly funds: therapies when no insurance exists, hearing aids (75% of people with DS have hearing loss), specialized medical equipment, cardiology or GI procedures common in Down syndrome, speech devices and communication technology, travel expenses to specialized Down syndrome clinics.\n\nThe monthly application cycle means families can't apply anytime\u2014they must submit by the 15th of each month. However, this creates predictable timelines.",
+                "short_description": "UnitedHealthcare Children's Foundation (UHCCF) is one of the most accessible major grant programs for medical expenses not fully covered by insurance. Since 1998, the foundation has distributed over $...",
+                "full_description": "UnitedHealthcare Children's Foundation (UHCCF) is one of the most accessible major grant programs for medical expenses not fully covered by insurance. Since 1998, the foundation has distributed over $70 million to more than 35,000 children with various medical conditions including Down syndrome.\n\nThe critical and often misunderstood fact: families do NOT need UnitedHealthcare insurance to qualify. Any commercial (private) health insurance meets the requirement\u2014employer plans, marketplace plans, or individual policies from any carrier.\n\nGrants range from $500 to $5,000 per calendar year with a lifetime maximum of $10,000, filling the gap for families facing high deductibles, limited therapy caps, or services insurance simply doesn't cover.",
+                "key_features": "\u2022 ANY INSURANCE ACCEPTED: Don't need UnitedHealthcare specifically\n\u2022 $5,000 ANNUAL GRANT: Substantial assistance per year\n\u2022 $10,000 LIFETIME MAX: Can receive funding over multiple years\n\u2022 MIDDLE-INCOME FRIENDLY: Income limits reach $170,000 for larger families\n\u2022 COVERS THERAPY: PT, OT, speech after insurance caps exhausted\n\u2022 COVERS EQUIPMENT: Wheelchairs, orthotics, communication devices, adaptive equipment\n\u2022 COVERS MEDICAL: Surgeries, procedures, prescriptions\n\u2022 ABA THERAPY: One-time funding for ages 3-6 (limited scope but available)\n\u2022 YEAR-ROUND APPLICATIONS: No deadline; rolling acceptance\n\u2022 DIRECT PAYMENT: Funds go to providers, simplifying process\n\u2022 70% APPROVAL RATE: Strong odds with good documentation\n\u2022 SECONDARY MEDICAID OK: Having Medicaid as secondary insurance doesn't disqualify",
+                "practical_notes": "UHCCF is dramatically underutilized because families think they need UnitedHealthcare insurance (false) or assume having insurance disqualifies them (false).\n\nEven families with \"good\" insurance face substantial out-of-pocket costs. A therapy cap of 30 visits per year sounds reasonable until your child needs weekly speech therapy (52 visits). After hitting the cap in July, families face $150-200 per session out-of-pocket for the rest of the year\u2014$3,000-4,000+ in uncovered costs. UHCCF fills this exact gap.\n\nThe $170,000 income limit for larger families is surprisingly generous. A two-parent household with three kids earning $100,000 qualifies\u2014this includes many solidly middle-class families.",
                 "date_added": "2026-01-26",
                 "last_verified": "2026-01-01",
                 "verification_source": "Migration from v1 database",
@@ -1756,10 +1799,10 @@
                 "cost_type": "Free",
                 "cost_details": "",
                 "application_status": "Open - Deadline",
-                "short_description": "The Katie Beckett/TEFRA program is a Medicaid option that disregards parental income when determining a child's eligibility for Medicaid. This is transformative for middle and upper-income families wh...",
-                "full_description": "The Katie Beckett/TEFRA program is a Medicaid option that disregards parental income when determining a child's eligibility for Medicaid. This is transformative for middle and upper-income families whose children have significant medical or developmental needs but who don't qualify for traditional Medicaid due to parent earnings.\n\nNamed after Katie Beckett, whose situation in 1981 revealed a policy inequity (children in institutions got Medicaid regardless of parent income, but identical children at home were denied), this program allows children requiring institutional-level care to receive Medicaid while living at home, counting only the child's own income (typically $0).\n\nAvailable in 18 states plus DC, this program has no waitlist and is an entitlement, making it crucial for families earning $75,000-$200,000+ who face substantial medical costs that insurance doesn't fully cover.",
-                "key_features": "\u2022 PARENT INCOME WAIVED: Only child's income/assets count (usually $0)\n\u2022 NO WAITLIST: Entitlement program unlike most HCBS waivers\n\u2022 FULL MEDICAID BENEFITS: Complete coverage including unlimited therapy\n\u2022 AGES BIRTH-18: Available throughout childhood\n\u2022 INSTITUTIONAL LEVEL OF CARE: Criteria most children with DS meet\n\u2022 STATE-SPECIFIC NAMES: Called Katie Beckett, TEFRA, or state-specific names\n\u2022 COMPREHENSIVE SERVICES: Medical, dental, therapy, equipment, prescriptions, hospital\n\u2022 NO COST SHARING: No copays, deductibles, or out-of-pocket costs\n\u2022 RETROACTIVE COVERAGE: May cover bills from up to 3 months before application\n\u2022 SECONDARY INSURANCE: Can coordinate with private insurance",
-                "practical_notes": "Katie Beckett/TEFRA is the single most important program for middle and upper-income families with children with Down syndrome. A family earning $150,000 annually can have their child receive full Medicaid benefits, accessing unlimited therapy, medical equipment, and healthcare without depleting savings.\n\nMany families don't realize they qualify or are intimidated by the \"institutional level of care\" language. This doesn't mean your child needs to be severely disabled or medically fragile. It means they need services comparable to what would be provided in a facility setting. Most children with Down syndrome meet this through therapy needs alone\u2014speech therapy 2-3x weekly, OT weekly, PT weekly, plus developmental services easily constitutes institutional-level support.\n\nUnfortunately, only 18 states plus DC currently offer this program. If your state doesn't participate, advocate for its adoption. Contact state legislators, disability advocacy organizations, and Medicaid offices to request implementation. Several states have added Katie Beckett in recent years following parent advocacy campaigns.\n\nFor families in participating states who were previously denied traditional Medicaid due to income, this program is life-changing. The annual value of unlimited therapy and medical coverage can easily exceed $30,000-$50,000, far more than most families could afford to pay out-of-pocket.",
+                "short_description": "First Hand Foundation provides medical grants to children who are uninsured or underinsured, complementing programs like UHCCF that require commercial insurance. Since 2004, the foundation has distrib...",
+                "full_description": "First Hand Foundation provides medical grants to children who are uninsured or underinsured, complementing programs like UHCCF that require commercial insurance. Since 2004, the foundation has distributed over $20 million to children with medical conditions across all 50 states.\n\nThe key distinction: First Hand specifically serves families who lack adequate insurance coverage\u2014those with no insurance at all, high-deductible plans that make care unaffordable, limited benefits that exclude necessary services, or those who recently lost coverage.\n\nGrants range from $500 to $5,000 with no stated lifetime maximum, and families can reapply every 12 months as long as they continue to meet eligibility criteria.",
+                "key_features": "\u2022 SERVES UNINSURED: Primary focus on families without insurance\n\u2022 UNDERINSURED ACCEPTED: Also helps those with inadequate coverage\n\u2022 REAPPLY ANNUALLY: No lifetime cap; can receive grants multiple years\n\u2022 $500-$5,000 GRANTS: Meaningful assistance for medical costs\n\u2022 BROAD EXPENSE COVERAGE: Medical, therapy, medications, equipment, vehicle modifications, travel\n\u2022 MONTHLY CYCLES: Applications reviewed every month\n\u2022 30-DAY DECISIONS: Relatively quick turnaround\n\u2022 $20M+ DISTRIBUTED: Proven track record since 2004\n\u2022 ALL 50 STATES: Nationwide availability\n\u2022 VEHICLE MODIFICATIONS: Unique coverage for accessibility needs\n\u2022 MEDICAL TRAVEL: Covers gas, hotels, meals for specialty care",
+                "practical_notes": "First Hand Foundation fills a critical gap for families who fall between Medicaid (too high income) and commercial insurance (can't afford or recently lost coverage).\n\nFor families affected by Down syndrome, First Hand commonly funds: therapies when no insurance exists, hearing aids (75% of people with DS have hearing loss), specialized medical equipment, cardiology or GI procedures common in Down syndrome, speech devices and communication technology, travel expenses to specialized Down syndrome clinics.\n\nThe monthly application cycle means families can't apply anytime\u2014they must submit by the 15th of each month. However, this creates predictable timelines.",
                 "date_added": "2026-01-26",
                 "last_verified": "2026-01-01",
                 "verification_source": "Migration from v1 database",
@@ -10778,6 +10821,8 @@
         let sidebarCollapsed = true;
         let resourcesVisible = 20;
         let inspirationVisible = 20;
+        let resourceSearch = '';
+        let inspirationSearch = '';
         const itemsPerPage = 20;
         let filters = {
             subcategory: [],
@@ -10912,8 +10957,30 @@
             render();
         };
 
+        const handleResourceSearch = (value) => {
+            resourceSearch = value.toLowerCase();
+            resourcesVisible = itemsPerPage;
+            render();
+        };
+
+        const handleInspirationSearch = (value) => {
+            inspirationSearch = value.toLowerCase();
+            inspirationVisible = itemsPerPage;
+            render();
+        };
+
         const getFilteredResources = () => {
             let results = [...resourcesData];
+            
+            // Search filter
+            if (resourceSearch) {
+                results = results.filter(r => 
+                    r.resource_name?.toLowerCase().includes(resourceSearch) ||
+                    r.short_description?.toLowerCase().includes(resourceSearch) ||
+                    r.organization_name?.toLowerCase().includes(resourceSearch) ||
+                    r.subcategories?.toLowerCase().includes(resourceSearch)
+                );
+            }
             
             if (filters.subcategory.length) {
                 results = results.filter(r => filters.subcategory.some(f => r.subcategories?.includes(f)));
@@ -10944,6 +11011,18 @@
 
         const getFilteredInspiration = () => {
             let results = [...inspirationData];
+            
+            // Search filter
+            if (inspirationSearch) {
+                results = results.filter(p => 
+                    p.full_name?.toLowerCase().includes(inspirationSearch) ||
+                    p.known_as___stage_name?.toLowerCase().includes(inspirationSearch) ||
+                    p.short_bio?.toLowerCase().includes(inspirationSearch) ||
+                    p.primary_field?.toLowerCase().includes(inspirationSearch) ||
+                    p.location_city?.toLowerCase().includes(inspirationSearch) ||
+                    p.location_state?.toLowerCase().includes(inspirationSearch)
+                );
+            }
             
             if (inspirationFilters.field.length) {
                 results = results.filter(p => {
@@ -11177,6 +11256,9 @@
                         <div class="page-header">
                             <h1 class="page-title">Financial Resources</h1>
                             <p class="page-subtitle">Grants, benefits, scholarships, and support programs for the Down syndrome community.</p>
+                            <div class="search-bar">
+                                <input type="text" class="search-input" placeholder="Search resources..." value="${resourceSearch}" oninput="handleResourceSearch(this.value)">
+                            </div>
                         </div>
                         
                         <div class="results-header">
@@ -11229,6 +11311,9 @@
                     <div class="page-header">
                         <h1 class="page-title">Inspiring Individuals</h1>
                         <p class="page-subtitle">Meet role models making an impact — athletes, artists, entrepreneurs, advocates, and more.</p>
+                        <div class="search-bar">
+                            <input type="text" class="search-input" placeholder="Search by name, field, location..." value="${inspirationSearch}" oninput="handleInspirationSearch(this.value)">
+                        </div>
                     </div>
                     
                     <div class="results-header">
@@ -11517,6 +11602,11 @@
 
         // Main render
         const render = () => {
+            // Save current focus and cursor position
+            const activeEl = document.activeElement;
+            const isSearchFocused = activeEl && activeEl.classList.contains('search-input');
+            const cursorPos = isSearchFocused ? activeEl.selectionStart : 0;
+            
             let content = '';
             
             if (currentPage === 'detail') {
@@ -11539,6 +11629,15 @@
                 ${renderHeader()}
                 ${(currentPage === 'home' || currentPage === 'about') ? `<main style="margin-top: 70px;">${content}</main>` : content}
             `;
+            
+            // Restore focus to search input if it was focused
+            if (isSearchFocused) {
+                const searchInput = document.querySelector('.search-input');
+                if (searchInput) {
+                    searchInput.focus();
+                    searchInput.setSelectionRange(cursorPos, cursorPos);
+                }
+            }
         };
 
         render();
