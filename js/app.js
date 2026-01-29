@@ -46,12 +46,18 @@ let inspirationFilters = {
 // Map Supabase column names to expected app field names
 const mapFinancialResource = (row) => ({
     ...row,
-    program_id: row.program_id || row.id,
-    program_name: row.program_name || row.name,
-    program_category: row.program_category || row.category,
-    program_description: row.program_description || row.description,
-    'key_features_&_benefits': row['key_features_&_benefits'] || row.key_features_benefits || row.key_features,
-    'real-world_context': row['real-world_context'] || row.real_world_context
+    program_id: row.resource_id || row.id,
+    program_name: row.resource_name,
+    program_category: row.primary_category,
+    program_description: row.short_description || row.full_description,
+    geographic_coverage: row.jurisdiction_level,
+    age_range_min: row.age_min,
+    age_range_max: row.age_max,
+    award_amount_min: row.amount_min,
+    award_amount_max: row.amount_max,
+    income_limit: row.income_limit_exists ? row.income_limit_details : 'None',
+    'key_features_&_benefits': row.key_features,
+    'real-world_context': row.practical_notes
 });
 
 async function loadData() {
