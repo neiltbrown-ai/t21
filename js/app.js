@@ -1,6 +1,11 @@
 // T21 Directory - Main Application
 // Restored to match original layout with therapy additions
 
+// ============== SUPABASE CONFIG ==============
+const SUPABASE_URL = 'https://qistidaxuevycutiegsa.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpc3RpZGF4dWV2eWN1dGllZ3NhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3MTM5NTAsImV4cCI6MjA4NTI4OTk1MH0.6U6g4gsabRGxvcPAaO1so5cZgS38GqGhKfHmq6E9dSA';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // ============== DATA ==============
 let resourcesData = [];
 let therapyData = [];
@@ -39,14 +44,19 @@ let inspirationFilters = {
 // ============== DATA LOADING ==============
 async function loadData() {
     try {
-        const [fin, ther, insp] = await Promise.all([
-            fetch('data/financial.json').then(r => r.json()),
-            fetch('data/therapy.json').then(r => r.json()),
-            fetch('data/inspiration.json').then(r => r.json())
+        const [finRes, therRes, inspRes] = await Promise.all([
+            supabase.from('financial_resources').select('*'),
+            supabase.from('therapy_services').select('*'),
+            supabase.from('inspiration_profiles').select('*')
         ]);
-        resourcesData = fin;
-        therapyData = ther;
-        inspirationData = insp;
+
+        if (finRes.error) throw finRes.error;
+        if (therRes.error) throw therRes.error;
+        if (inspRes.error) throw inspRes.error;
+
+        resourcesData = finRes.data;
+        therapyData = therRes.data;
+        inspirationData = inspRes.data;
         console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
         render();
     } catch (err) {
