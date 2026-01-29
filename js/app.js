@@ -338,10 +338,6 @@ const renderSidebar = (type) => {
                     <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
                 </div>
 
-                <div class="search-box" id="search-box-container">
-                    <!-- Search input is created programmatically to persist across renders -->
-                </div>
-
                 <button class="reset-filters-btn ${hasActiveTherapyFilters() ? 'active' : ''}" onclick="resetTherapyFilters()">
                     ${hasActiveTherapyFilters() ? 'Reset Filters' : 'No Filters Applied'}
                 </button>
@@ -419,10 +415,6 @@ const renderSidebar = (type) => {
                     <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
                 </div>
                 
-                <div class="search-box" id="search-box-container">
-                    <!-- Search input is created programmatically to persist across renders -->
-                </div>
-
                 <button class="reset-filters-btn ${hasActiveFilters() ? 'active' : ''}" onclick="resetFilters()">
                     ${hasActiveFilters() ? 'Reset Filters' : 'No Filters Applied'}
                 </button>
@@ -679,6 +671,10 @@ const renderResourcesPage = () => {
                 <div class="page-header">
                     <h1 class="page-title">Resources Directory</h1>
                     <p class="page-subtitle">Comprehensive support resources for the Down syndrome community.</p>
+                </div>
+
+                <div id="search-box-container" class="content-search-box">
+                    <!-- Search input inserted here by JavaScript -->
                 </div>
 
                 <div class="sub-tabs">
