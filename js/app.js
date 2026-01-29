@@ -208,25 +208,26 @@ window.resetInspirationFilters = function() {
     render();
 }
 
+// Debounce timer for search
+let searchDebounceTimer = null;
+
 window.handleSearch = function(value) {
-    searchQuery = value.toLowerCase();
-    // Only update results area to preserve search input focus
-    const resultsContainer = document.getElementById('search-results-container');
-    const searchInput = document.getElementById('sidebar-search-input');
-
-    if (resultsContainer && currentPage === 'resources' && searchInput) {
-        // Save cursor position
-        const cursorPos = searchInput.selectionStart;
-
-        // Update only the results
-        resultsContainer.innerHTML = renderResourcesResults();
-
-        // Restore focus and cursor position
-        searchInput.focus();
-        searchInput.setSelectionRange(cursorPos, cursorPos);
-    } else {
-        render();
+    // Clear any pending search
+    if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer);
     }
+
+    // Debounce: wait 300ms after user stops typing before updating results
+    searchDebounceTimer = setTimeout(() => {
+        searchQuery = value.toLowerCase();
+        const resultsContainer = document.getElementById('search-results-container');
+
+        if (resultsContainer && currentPage === 'resources') {
+            resultsContainer.innerHTML = renderResourcesResults();
+        } else {
+            render();
+        }
+    }, 300);
 }
 
 const hasActiveFilters = () => Object.values(filters).some(arr => arr.length > 0);
