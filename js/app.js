@@ -1100,9 +1100,12 @@ const renderAboutPage = () => `
 const render = () => {
     // Save search input state before render
     const oldSearchInput = document.getElementById('sidebar-search-input');
-    const searchWasFocused = oldSearchInput && document.activeElement === oldSearchInput;
-    const searchValue = oldSearchInput ? oldSearchInput.value : '';
-    const cursorPos = oldSearchInput ? oldSearchInput.selectionStart : 0;
+    const searchWasFocused = oldSearchInput && (
+        document.activeElement === oldSearchInput ||
+        document.activeElement?.closest('.sidebar')
+    );
+    const searchValue = oldSearchInput ? oldSearchInput.value : searchQuery;
+    const cursorPos = oldSearchInput ? oldSearchInput.selectionStart : (searchValue ? searchValue.length : 0);
 
     let content = '';
 
@@ -1152,15 +1155,21 @@ const render = () => {
     document.getElementById('app').innerHTML = header + (currentPage === 'home' ? `<main style="margin-top: 70px;">${content}</main>` : content);
 
     // Restore search input state after render
-    if (searchWasFocused || searchValue) {
-        const newSearchInput = document.getElementById('sidebar-search-input');
-        if (newSearchInput) {
-            newSearchInput.value = searchValue;
-            if (searchWasFocused) {
-                newSearchInput.focus();
-                newSearchInput.setSelectionRange(cursorPos, cursorPos);
+    const newSearchInput = document.getElementById('sidebar-search-input');
+    if (newSearchInput && (searchWasFocused || searchValue)) {
+        // Use setTimeout to ensure DOM is fully ready
+        setTimeout(() => {
+            const input = document.getElementById('sidebar-search-input');
+            if (input) {
+                input.value = searchValue;
+                if (searchWasFocused) {
+                    input.focus();
+                    try {
+                        input.setSelectionRange(cursorPos, cursorPos);
+                    } catch (e) {}
+                }
             }
-        }
+        }, 0);
     }
 };
 
