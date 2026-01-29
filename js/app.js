@@ -1004,15 +1004,23 @@ const renderAboutPage = () => `
     <div class="about-page" style="margin-top: 70px;">
         <div class="about-hero">
             <div class="about-hero-content">
-                <h1>About T21</h1>
-                <p>Building the resource we wished existed when our journey began.</p>
+                <h1>Building an Operating System for Thriving</h1>
+                <p>Every family raising a child with Down syndrome deserves a roadmap &mdash; not just to survive, but to truly thrive.</p>
             </div>
         </div>
         
         <div class="about-content">
             <div class="about-section">
-                <h2>Our Mission</h2>
-                <p>T21 exists to ensure every family touched by Down syndrome has access to the resources, support, and inspiration they need to thrive &#8212; regardless of where they live, their income level, or their prior knowledge of available benefits.</p>
+                <h2>The Challenge</h2>
+                <p>When you become a parent to a child with Down syndrome, you quickly realize that love isn't enough. You need to become an advocate, a researcher, a benefits specialist, an IEP negotiator, a therapy coordinator, and so much more &mdash; often all before your morning coffee.</p>
+                <p>Finding the right therapists. Understanding SSI and Medicaid waivers. Navigating the school system. Discovering inclusive sports programs. Connecting with other families who get it. Each of these is its own full-time job, and there's no single place to find what you need.</p>
+                <p>For families who travel frequently, the challenge multiplies. Resources vary by state. Programs have different eligibility requirements. What works in one city may not exist in another.</p>
+            </div>
+            
+            <div class="about-section">
+                <h2>The Vision</h2>
+                <p>T21 is more than a directory &mdash; it's an operating system for families. A framework for building a wonderful life where your child with Down syndrome can reach their full potential, and your entire family can thrive together.</p>
+                <p>We believe that access to information shouldn't depend on how many Facebook groups you've joined, which parent advocates you happen to know, or how many hours you can spend researching. Every family deserves to know about the $50+ billion in annual funding available, the free therapy programs, the inclusive schools, and the inspiring role models who prove what's possible.</p>
                 
                 <div class="about-pillars">
                     <div class="about-pillar">
@@ -1020,39 +1028,41 @@ const renderAboutPage = () => `
                             <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         </div>
                         <h3>Financial Foundation</h3>
-                        <p>Navigate benefits, grants, and scholarships that can provide significant support.</p>
-                    </div>
-                    <div class="about-pillar">
-                        <div class="about-pillar-icon" style="background: #8b5cf6;">
-                            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                        </div>
-                        <h3>Healthcare Access</h3>
-                        <p>Find DS specialty clinics, therapy services, and healthcare providers.</p>
+                        <p>Navigate benefits, grants, and scholarships that can provide hundreds of thousands of dollars in support over your child's lifetime.</p>
                     </div>
                     <div class="about-pillar">
                         <div class="about-pillar-icon" style="background: var(--color-secondary);">
-                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                         </div>
                         <h3>Community &amp; Inspiration</h3>
-                        <p>Connect with role models and families who show what's possible.</p>
+                        <p>Connect with role models, advocates, and families who show what's possible and remind us we're not alone on this journey.</p>
+                    </div>
+                    <div class="about-pillar">
+                        <div class="about-pillar-icon" style="background: var(--color-tertiary);">
+                            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        </div>
+                        <h3>Knowledge &amp; Advocacy</h3>
+                        <p>Arm yourself with the information you need to advocate effectively &mdash; at school, with healthcare providers, and in your community.</p>
                     </div>
                 </div>
             </div>
             
             <div class="about-section about-personal">
                 <h2>Our Story</h2>
-                <p>T21 was born from our own family's journey. We have two boys &#8212; ages 9 and 6. Our younger son has Down syndrome, and from the moment of his diagnosis, we dove headfirst into learning everything we could to give him the best possible life.</p>
-                <p>We've spent countless hours researching therapies, applying for benefits, advocating at school, finding inclusive activities, and connecting with other families. It's nearly a full-time job &#8212; and we're lucky to have the time and resources to do it.</p>
-                <p>But we kept thinking: what about families who don't have these advantages? What about the single parent working two jobs? The family in a rural area? The parents who don't know their child automatically qualifies for SSI?</p>
-                <p>We wanted to build the tool we wished existed &#8212; a comprehensive, searchable directory that any family could use to find the support they need.</p>
+                <p>T21 was born from our own family's journey. We have two boys &mdash; ages 9 and 6. Our younger son has Down syndrome, and from the moment of his diagnosis, we dove headfirst into learning everything we could to give him the best possible life.</p>
+                <p>We've spent countless hours researching therapies, applying for benefits, advocating at our amazing public school, finding inclusive recreational activities, and connecting with other families. It's nearly a full-time job on top of our actual full-time jobs &mdash; and we're lucky to have the time and resources to do it.</p>
+                <p>But we kept thinking: what about families who don't have these advantages? What about the single parent working two jobs? The family in a rural area without a local Down syndrome association? The parents who don't know that their child automatically qualifies for SSI, or that early intervention services are free and federally guaranteed?</p>
+                <p>We travel frequently as a family, and we've seen firsthand how resources vary dramatically from place to place. We wanted to build the tool we wished existed &mdash; a comprehensive, searchable, always-updated directory that any family could use to find the support they need, wherever they are.</p>
+                <p>That's T21. And we're just getting started.</p>
             </div>
             
-            <div class="about-cta">
+            <div class="about-section about-cta">
                 <h2>Join Us</h2>
-                <p>T21 is a community effort. We're building this directory together &#8212; parents, advocates, organizations, and allies.</p>
+                <p>T21 is a community effort. We're building this directory together &mdash; parents, advocates, organizations, and allies who believe every family deserves access to the resources that can change lives.</p>
                 <div class="about-cta-buttons">
-                    <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Explore Resources &#8594;</a>
+                    <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Explore Resources &rarr;</a>
                     <button class="btn btn-secondary">Submit a Resource</button>
+                    <button class="btn btn-secondary">Get Involved</button>
                 </div>
             </div>
         </div>
