@@ -4,7 +4,8 @@
 // ============== SUPABASE CONFIG ==============
 const SUPABASE_URL = 'https://qistidaxuevycutiegsa.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpc3RpZGF4dWV2eWN1dGllZ3NhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3MTM5NTAsImV4cCI6MjA4NTI4OTk1MH0.6U6g4gsabRGxvcPAaO1so5cZgS38GqGhKfHmq6E9dSA';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============== DATA ==============
 let resourcesData = [];
@@ -45,9 +46,9 @@ let inspirationFilters = {
 async function loadData() {
     try {
         const [finRes, therRes, inspRes] = await Promise.all([
-            supabase.from('financial_resources').select('*'),
-            supabase.from('therapy_services').select('*'),
-            supabase.from('inspiration_profiles').select('*')
+            supabaseClient.from('financial_resources').select('*'),
+            supabaseClient.from('therapy_services').select('*'),
+            supabaseClient.from('inspiration_profiles').select('*')
         ]);
 
         if (finRes.error) throw finRes.error;
