@@ -208,22 +208,11 @@ window.resetInspirationFilters = function() {
     render();
 }
 
-// Debounce timer for search
-let searchDebounceTimer = null;
-
+// Search is triggered by pressing Enter in the search input
+// No automatic updates during typing to avoid focus issues
 window.handleSearch = function(value) {
-    // Update searchQuery immediately so it stays in sync
     searchQuery = value.toLowerCase();
-
-    // Clear any pending search update
-    if (searchDebounceTimer) {
-        clearTimeout(searchDebounceTimer);
-    }
-
-    // Debounce the render to avoid updating on every keystroke
-    searchDebounceTimer = setTimeout(() => {
-        render();
-    }, 300);
+    render();
 }
 
 const hasActiveFilters = () => Object.values(filters).some(arr => arr.length > 0);
@@ -1104,9 +1093,13 @@ const getOrCreateSearchInput = () => {
         persistentSearchInput.type = 'text';
         persistentSearchInput.id = 'sidebar-search-input';
         persistentSearchInput.className = 'search-input';
-        persistentSearchInput.placeholder = 'Search...';
-        persistentSearchInput.addEventListener('input', (e) => {
-            handleSearch(e.target.value);
+        persistentSearchInput.placeholder = 'Search... (press Enter)';
+        // Only update on Enter key - no updates during typing
+        persistentSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                searchQuery = e.target.value.toLowerCase();
+                render();
+            }
         });
     }
     return persistentSearchInput;
