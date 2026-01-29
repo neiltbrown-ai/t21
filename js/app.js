@@ -123,7 +123,7 @@ const getValueBadge = (r) => {
 const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
 
 // ============== NAVIGATION ==============
-function navigate(page, type = null, id = null) {
+window.navigate = function(page, type = null, id = null) {
     currentPage = page;
     currentDetailType = type;
     currentDetailId = id;
@@ -131,12 +131,12 @@ function navigate(page, type = null, id = null) {
     window.scrollTo(0, 0);
 }
 
-function switchResourceTab(tab) {
+window.switchResourceTab = function(tab) {
     currentResourceTab = tab;
     render();
 }
 
-function toggleMenu() {
+window.toggleMenu = function() {
     const menu = document.getElementById('mobileMenu');
     if (menu) {
         menu.classList.toggle('open');
@@ -144,7 +144,7 @@ function toggleMenu() {
     }
 }
 
-function closeMenu() {
+window.closeMenu = function() {
     const menu = document.getElementById('mobileMenu');
     if (menu) {
         menu.classList.remove('open');
@@ -152,18 +152,18 @@ function closeMenu() {
     }
 }
 
-function toggleSidebar() {
+window.toggleSidebar = function() {
     sidebarCollapsed = !sidebarCollapsed;
     render();
 }
 
-function expandSidebar() {
+window.expandSidebar = function() {
     sidebarCollapsed = false;
     render();
 }
 
 // ============== FILTERS ==============
-function toggleFilter(category, value) {
+window.toggleFilter = function(category, value) {
     const idx = filters[category].indexOf(value);
     if (idx > -1) {
         filters[category].splice(idx, 1);
@@ -173,7 +173,7 @@ function toggleFilter(category, value) {
     render();
 }
 
-function toggleTherapyFilter(category, value) {
+window.toggleTherapyFilter = function(category, value) {
     const idx = therapyFilters[category].indexOf(value);
     if (idx > -1) {
         therapyFilters[category].splice(idx, 1);
@@ -183,7 +183,7 @@ function toggleTherapyFilter(category, value) {
     render();
 }
 
-function toggleInspirationFilter(category, value) {
+window.toggleInspirationFilter = function(category, value) {
     const idx = inspirationFilters[category].indexOf(value);
     if (idx > -1) {
         inspirationFilters[category].splice(idx, 1);
@@ -193,22 +193,22 @@ function toggleInspirationFilter(category, value) {
     render();
 }
 
-function resetFilters() {
+window.resetFilters = function() {
     filters = { subcategory: [], lifecycle: [], jurisdiction: [], income: [], age: [] };
     render();
 }
 
-function resetTherapyFilters() {
+window.resetTherapyFilters = function() {
     therapyFilters = { serviceType: [], telehealth: [], jurisdiction: [] };
     render();
 }
 
-function resetInspirationFilters() {
+window.resetInspirationFilters = function() {
     inspirationFilters = { field: [], country: [] };
     render();
 }
 
-function handleSearch(value) {
+window.handleSearch = function(value) {
     searchQuery = value.toLowerCase();
     render();
 }
@@ -218,17 +218,17 @@ const hasActiveTherapyFilters = () => Object.values(therapyFilters).some(arr => 
 const hasActiveInspirationFilters = () => Object.values(inspirationFilters).some(arr => arr.length > 0);
 
 // ============== LOAD MORE ==============
-function loadMoreResources() {
+window.loadMoreResources = function() {
     resourcesVisible += 10;
     render();
 }
 
-function loadMoreTherapy() {
+window.loadMoreTherapy = function() {
     therapyVisible += 10;
     render();
 }
 
-function loadMoreInspiration() {
+window.loadMoreInspiration = function() {
     inspirationVisible += 12;
     render();
 }
