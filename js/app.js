@@ -212,8 +212,18 @@ window.handleSearch = function(value) {
     searchQuery = value.toLowerCase();
     // Only update results area to preserve search input focus
     const resultsContainer = document.getElementById('search-results-container');
-    if (resultsContainer && currentPage === 'resources') {
+    const searchInput = document.getElementById('sidebar-search-input');
+
+    if (resultsContainer && currentPage === 'resources' && searchInput) {
+        // Save cursor position
+        const cursorPos = searchInput.selectionStart;
+
+        // Update only the results
         resultsContainer.innerHTML = renderResourcesResults();
+
+        // Restore focus and cursor position
+        searchInput.focus();
+        searchInput.setSelectionRange(cursorPos, cursorPos);
     } else {
         render();
     }
@@ -343,8 +353,8 @@ const renderSidebar = (type) => {
                 </div>
                 
                 <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search services..." 
-                           value="${searchQuery}" onkeyup="handleSearch(this.value)">
+                    <input type="text" id="sidebar-search-input" class="search-input" placeholder="Search services..."
+                           value="${searchQuery}" oninput="handleSearch(this.value)">
                 </div>
                 
                 <button class="reset-filters-btn ${hasActiveTherapyFilters() ? 'active' : ''}" onclick="resetTherapyFilters()">
@@ -425,8 +435,8 @@ const renderSidebar = (type) => {
                 </div>
                 
                 <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search resources..." 
-                           value="${searchQuery}" onkeyup="handleSearch(this.value)">
+                    <input type="text" id="sidebar-search-input" class="search-input" placeholder="Search resources..."
+                           value="${searchQuery}" oninput="handleSearch(this.value)">
                 </div>
                 
                 <button class="reset-filters-btn ${hasActiveFilters() ? 'active' : ''}" onclick="resetFilters()">
