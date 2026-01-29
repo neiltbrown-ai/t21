@@ -1,40 +1,42 @@
 // T21 Directory - Main Application
-// Modular, clean architecture with externalized data
-
-// ============== STATE ==============
-let state = {
-    currentPage: 'home',
-    currentDetailId: null,
-    currentDetailType: null,
-    currentResourceTab: 'financial',
-    sidebarCollapsed: true,
-    resourcesVisible: 10,
-    therapyVisible: 10,
-    inspirationVisible: 12,
-    searchQuery: '',
-    filters: {
-        subcategory: [],
-        jurisdiction: [],
-        income: [],
-        age: []
-    },
-    therapyFilters: {
-        serviceType: [],
-        telehealth: [],
-        jurisdiction: []
-    },
-    inspirationFilters: {
-        field: [],
-        country: []
-    }
-};
+// Restored to match original layout with therapy additions
 
 // ============== DATA ==============
-let financialData = [];
+let resourcesData = [];
 let therapyData = [];
 let inspirationData = [];
 
-// Load data from JSON files
+// ============== STATE ==============
+let currentPage = 'home';
+let currentDetailId = null;
+let currentDetailType = null;
+let currentResourceTab = 'financial';
+let sidebarCollapsed = true;
+let resourcesVisible = 10;
+let therapyVisible = 10;
+let inspirationVisible = 12;
+let searchQuery = '';
+
+let filters = {
+    subcategory: [],
+    lifecycle: [],
+    jurisdiction: [],
+    income: [],
+    age: []
+};
+
+let therapyFilters = {
+    serviceType: [],
+    telehealth: [],
+    jurisdiction: []
+};
+
+let inspirationFilters = {
+    field: [],
+    country: []
+};
+
+// ============== DATA LOADING ==============
 async function loadData() {
     try {
         const [fin, ther, insp] = await Promise.all([
@@ -42,14 +44,14 @@ async function loadData() {
             fetch('data/therapy.json').then(r => r.json()),
             fetch('data/inspiration.json').then(r => r.json())
         ]);
-        financialData = fin;
+        resourcesData = fin;
         therapyData = ther;
         inspirationData = insp;
-        console.log(`Loaded: ${financialData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
+        console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
         render();
     } catch (err) {
         console.error('Error loading data:', err);
-        document.getElementById('app').innerHTML = '<div class="loading">Error loading data. Please refresh.</div>';
+        document.getElementById('app').innerHTML = '<div style="padding: 2rem; text-align: center;">Error loading data. Please refresh.</div>';
     }
 }
 
@@ -71,6 +73,7 @@ const getFieldColor = (field) => {
         'Athlete': { bg: '#ffedd5', text: '#ea580c' },
         'Artist': { bg: '#e0e7ff', text: '#4f46e5' },
         'Modeling': { bg: '#fce7f3', text: '#db2777' },
+        'Advocacy': { bg: '#dbeafe', text: '#1d4ed8' },
     };
     return colors[normalizeField(field)] || { bg: '#f3f4f6', text: '#374151' };
 };
@@ -83,7 +86,7 @@ const formatAmount = (min, max) => {
     return `$${Number(min).toLocaleString()}\u2013$${Number(max).toLocaleString()}`;
 };
 
-// Dynamic value badge based on resource type
+// Dynamic value badge based on resource type (from ds_directory_ui_logic.md)
 const getValueBadge = (r) => {
     const category = r.program_category || r.subcategories || '';
     const awardMin = r.award_amount_min;
@@ -120,145 +123,146 @@ const getValueBadge = (r) => {
 const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
 
 // ============== NAVIGATION ==============
-window.navigate = (page, type = null, id = null) => {
-    state.currentPage = page;
-    state.currentDetailType = type;
-    state.currentDetailId = id;
+function navigate(page, type = null, id = null) {
+    currentPage = page;
+    currentDetailType = type;
+    currentDetailId = id;
     render();
     window.scrollTo(0, 0);
-};
+}
 
-window.switchResourceTab = (tab) => {
-    state.currentResourceTab = tab;
+function switchResourceTab(tab) {
+    currentResourceTab = tab;
     render();
-};
+}
 
-window.toggleMenu = () => {
+function toggleMenu() {
     const menu = document.getElementById('mobileMenu');
-    if (menu) menu.classList.toggle('active');
-};
+    if (menu) {
+        menu.classList.toggle('open');
+        document.getElementById('menuToggle').classList.toggle('active');
+    }
+}
 
-window.closeMenu = () => {
+function closeMenu() {
     const menu = document.getElementById('mobileMenu');
-    if (menu) menu.classList.remove('active');
-};
+    if (menu) {
+        menu.classList.remove('open');
+        document.getElementById('menuToggle').classList.remove('active');
+    }
+}
 
-window.toggleSidebar = () => {
-    state.sidebarCollapsed = !state.sidebarCollapsed;
+function toggleSidebar() {
+    sidebarCollapsed = !sidebarCollapsed;
     render();
-};
+}
 
-window.expandSidebar = () => {
-    state.sidebarCollapsed = false;
+function expandSidebar() {
+    sidebarCollapsed = false;
     render();
-};
+}
 
 // ============== FILTERS ==============
-window.toggleFilter = (category, value) => {
-    const idx = state.filters[category].indexOf(value);
+function toggleFilter(category, value) {
+    const idx = filters[category].indexOf(value);
     if (idx > -1) {
-        state.filters[category].splice(idx, 1);
+        filters[category].splice(idx, 1);
     } else {
-        state.filters[category].push(value);
+        filters[category].push(value);
     }
     render();
-};
+}
 
-window.toggleTherapyFilter = (category, value) => {
-    const idx = state.therapyFilters[category].indexOf(value);
+function toggleTherapyFilter(category, value) {
+    const idx = therapyFilters[category].indexOf(value);
     if (idx > -1) {
-        state.therapyFilters[category].splice(idx, 1);
+        therapyFilters[category].splice(idx, 1);
     } else {
-        state.therapyFilters[category].push(value);
+        therapyFilters[category].push(value);
     }
     render();
-};
+}
 
-window.toggleInspirationFilter = (category, value) => {
-    const idx = state.inspirationFilters[category].indexOf(value);
+function toggleInspirationFilter(category, value) {
+    const idx = inspirationFilters[category].indexOf(value);
     if (idx > -1) {
-        state.inspirationFilters[category].splice(idx, 1);
+        inspirationFilters[category].splice(idx, 1);
     } else {
-        state.inspirationFilters[category].push(value);
+        inspirationFilters[category].push(value);
     }
     render();
-};
+}
 
-window.resetFilters = () => {
-    state.filters = { subcategory: [], jurisdiction: [], income: [], age: [] };
+function resetFilters() {
+    filters = { subcategory: [], lifecycle: [], jurisdiction: [], income: [], age: [] };
     render();
-};
+}
 
-window.resetTherapyFilters = () => {
-    state.therapyFilters = { serviceType: [], telehealth: [], jurisdiction: [] };
+function resetTherapyFilters() {
+    therapyFilters = { serviceType: [], telehealth: [], jurisdiction: [] };
     render();
-};
+}
 
-window.resetInspirationFilters = () => {
-    state.inspirationFilters = { field: [], country: [] };
+function resetInspirationFilters() {
+    inspirationFilters = { field: [], country: [] };
     render();
-};
+}
 
-window.handleSearch = (value) => {
-    state.searchQuery = value.toLowerCase();
+function handleSearch(value) {
+    searchQuery = value.toLowerCase();
     render();
-};
+}
 
-const hasActiveFilters = () => Object.values(state.filters).some(arr => arr.length > 0);
-const hasActiveTherapyFilters = () => Object.values(state.therapyFilters).some(arr => arr.length > 0);
-const hasActiveInspirationFilters = () => Object.values(state.inspirationFilters).some(arr => arr.length > 0);
+const hasActiveFilters = () => Object.values(filters).some(arr => arr.length > 0);
+const hasActiveTherapyFilters = () => Object.values(therapyFilters).some(arr => arr.length > 0);
+const hasActiveInspirationFilters = () => Object.values(inspirationFilters).some(arr => arr.length > 0);
 
 // ============== LOAD MORE ==============
-window.loadMoreResources = () => {
-    state.resourcesVisible += 10;
+function loadMoreResources() {
+    resourcesVisible += 10;
     render();
-};
+}
 
-window.loadMoreTherapy = () => {
-    state.therapyVisible += 10;
+function loadMoreTherapy() {
+    therapyVisible += 10;
     render();
-};
+}
 
-window.loadMoreInspiration = () => {
-    state.inspirationVisible += 12;
+function loadMoreInspiration() {
+    inspirationVisible += 12;
     render();
-};
+}
 
 // ============== FILTERED DATA ==============
-const getFilteredFinancial = () => {
-    let results = [...financialData];
+const getFilteredResources = () => {
+    let results = [...resourcesData];
     
-    // Search
-    if (state.searchQuery) {
+    if (searchQuery) {
         results = results.filter(r => 
-            (r.program_name || '').toLowerCase().includes(state.searchQuery) ||
-            (r.program_description || '').toLowerCase().includes(state.searchQuery) ||
-            (r.program_category || '').toLowerCase().includes(state.searchQuery)
+            (r.program_name || '').toLowerCase().includes(searchQuery) ||
+            (r.program_description || '').toLowerCase().includes(searchQuery) ||
+            (r.program_category || '').toLowerCase().includes(searchQuery)
         );
     }
     
-    // Category filter
-    if (state.filters.subcategory.length) {
-        results = results.filter(r => state.filters.subcategory.some(f => (r.program_category || '').includes(f)));
+    if (filters.subcategory.length) {
+        results = results.filter(r => filters.subcategory.some(f => (r.program_category || '').includes(f)));
     }
     
-    // Jurisdiction filter
-    if (state.filters.jurisdiction.length) {
-        results = results.filter(r => state.filters.jurisdiction.includes(r.geographic_coverage));
+    if (filters.jurisdiction.length) {
+        results = results.filter(r => filters.jurisdiction.includes(r.geographic_coverage));
     }
     
-    // Income filter
-    if (state.filters.income.includes('no')) {
-        results = results.filter(r => !r.income_limit || r.income_limit === 'None');
+    if (filters.income.includes('no')) {
+        results = results.filter(r => !r.income_limit || r.income_limit === 'None' || r.income_limit.toLowerCase().includes('none'));
     }
     
-    // Age filter
-    if (state.filters.age.length) {
+    if (filters.age.length) {
         results = results.filter(r => {
             const ageMin = r.age_range_min || 0;
             const ageMax = r.age_range_max || 99;
-            return state.filters.age.some(range => {
-                if (range === '0-3') return ageMin <= 3 && ageMax >= 0;
+            return filters.age.some(range => {
+                if (range === '0-3') return ageMin <= 3;
                 if (range === '3-5') return ageMin <= 5 && ageMax >= 3;
                 if (range === '5-18') return ageMin <= 18 && ageMax >= 5;
                 if (range === '18+') return ageMax >= 18;
@@ -273,37 +277,29 @@ const getFilteredFinancial = () => {
 const getFilteredTherapy = () => {
     let results = [...therapyData];
     
-    // Search
-    if (state.searchQuery) {
+    if (searchQuery) {
         results = results.filter(r => 
-            (r.resource_name || '').toLowerCase().includes(state.searchQuery) ||
-            (r.short_description || '').toLowerCase().includes(state.searchQuery) ||
-            (r.subcategories || '').toLowerCase().includes(state.searchQuery)
+            (r.resource_name || '').toLowerCase().includes(searchQuery) ||
+            (r.short_description || '').toLowerCase().includes(searchQuery) ||
+            (r.subcategories || '').toLowerCase().includes(searchQuery)
         );
     }
     
-    // Service type filter
-    if (state.therapyFilters.serviceType.length) {
+    if (therapyFilters.serviceType.length) {
         results = results.filter(r => 
-            state.therapyFilters.serviceType.some(s => (r.subcategories || '').includes(s))
+            therapyFilters.serviceType.some(s => (r.subcategories || '').includes(s))
         );
     }
     
-    // Telehealth filter
-    if (state.therapyFilters.telehealth.length) {
+    if (therapyFilters.telehealth.length && therapyFilters.telehealth.includes('Yes')) {
         results = results.filter(r => {
             const th = (r.telehealth_available || '').toLowerCase();
-            return state.therapyFilters.telehealth.some(f => {
-                if (f === 'Yes') return th === 'yes' || th.includes('yes');
-                if (f === 'No') return th === 'no' || th.includes('no');
-                return true;
-            });
+            return th === 'yes' || th.includes('yes');
         });
     }
     
-    // Jurisdiction filter
-    if (state.therapyFilters.jurisdiction.length) {
-        results = results.filter(r => state.therapyFilters.jurisdiction.includes(r.jurisdiction_level));
+    if (therapyFilters.jurisdiction.length) {
+        results = results.filter(r => therapyFilters.jurisdiction.includes(r.jurisdiction_level));
     }
     
     return results;
@@ -312,208 +308,188 @@ const getFilteredTherapy = () => {
 const getFilteredInspiration = () => {
     let results = [...inspirationData];
     
-    // Field filter
-    if (state.inspirationFilters.field.length) {
+    if (inspirationFilters.field.length) {
         results = results.filter(p => {
             const normalizedField = normalizeField(p.primary_field);
-            return state.inspirationFilters.field.includes(normalizedField);
+            return inspirationFilters.field.includes(normalizedField);
         });
     }
     
-    // Country filter
-    if (state.inspirationFilters.country.length) {
+    if (inspirationFilters.country.length) {
         results = results.filter(p => {
-            const country = (p.location_country || 'USA') === 'USA' ? 'United States' : p.location_country;
-            return state.inspirationFilters.country.includes(country);
+            const country = (p.location_country || 'USA');
+            const normalized = country === 'USA' ? 'United States' : country;
+            return inspirationFilters.country.includes(normalized);
         });
     }
     
     return results;
 };
 
-// ============== RENDER COMPONENTS ==============
-
-const renderHeader = () => `
-    <header>
-        <div class="header-content">
-            <a href="#" class="logo" onclick="navigate('home'); return false;">T21</a>
-            <nav>
-                <a href="#" class="${state.currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); return false;">Home</a>
-                <a href="#" class="${state.currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); return false;">Resources</a>
-                <a href="#" class="${state.currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); return false;">Inspiration</a>
-                <a href="#" class="${state.currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); return false;">About</a>
-            </nav>
-            <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
-        </div>
-    </header>
-    <div class="mobile-menu-overlay" id="mobileMenu">
-        <a href="#" onclick="navigate('home'); closeMenu(); return false;">Home</a>
-        <a href="#" onclick="navigate('resources'); closeMenu(); return false;">Resources</a>
-        <a href="#" onclick="navigate('inspiration'); closeMenu(); return false;">Inspiration</a>
-        <a href="#" onclick="navigate('about'); closeMenu(); return false;">About</a>
-    </div>
-`;
+// ============== RENDER: SIDEBAR ==============
+const renderSidebar = (type) => {
+    if (type === 'therapy') {
+        return `
+            <div class="sidebar ${sidebarCollapsed ? 'collapsed' : ''}">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Filters</span>
+                    <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search services..." 
+                           value="${searchQuery}" onkeyup="handleSearch(this.value)">
+                </div>
+                
+                <button class="reset-filters-btn ${hasActiveTherapyFilters() ? 'active' : ''}" onclick="resetTherapyFilters()">
+                    ${hasActiveTherapyFilters() ? 'Reset Filters' : 'No Filters Applied'}
+                </button>
+                
+                <div class="facet">
+                    <div class="facet-title">Service Type</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Service Type">
+                        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.serviceType.includes('DS Specialty Clinics') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'DS Specialty Clinics')"> DS Specialty Clinics</label>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.serviceType.includes('Speech') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'Speech')"> Speech Therapy</label>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.serviceType.includes('Physical') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'Physical')"> Physical Therapy</label>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.serviceType.includes('Occupational') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'Occupational')"> Occupational Therapy</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Telehealth</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Telehealth">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.telehealth.includes('Yes') ? 'checked' : ''} onchange="toggleTherapyFilter('telehealth', 'Yes')"> Available</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Coverage</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Coverage">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.jurisdiction.includes('National') ? 'checked' : ''} onchange="toggleTherapyFilter('jurisdiction', 'National')"> National</label>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.jurisdiction.includes('Regional') ? 'checked' : ''} onchange="toggleTherapyFilter('jurisdiction', 'Regional')"> Regional</label>
+                    <label class="filter"><input type="checkbox" ${therapyFilters.jurisdiction.includes('State') ? 'checked' : ''} onchange="toggleTherapyFilter('jurisdiction', 'State')"> State</label>
+                </div>
+            </div>
+        `;
+    } else if (type === 'inspiration') {
+        return `
+            <div class="sidebar ${sidebarCollapsed ? 'collapsed' : ''}">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Filters</span>
+                    <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
+                </div>
+                
+                <button class="reset-filters-btn ${hasActiveInspirationFilters() ? 'active' : ''}" onclick="resetInspirationFilters()">
+                    ${hasActiveInspirationFilters() ? 'Reset Filters' : 'No Filters Applied'}
+                </button>
+                
+                <div class="facet">
+                    <div class="facet-title">Field</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Field">
+                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Artist') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Artist')"> Artist</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Athlete') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Athlete')"> Athlete</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Entrepreneur') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Entrepreneur')"> Entrepreneur</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Modeling') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Modeling')"> Modeling</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.field.includes('Performing Arts') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Performing Arts')"> Performing Arts</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Country</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Country">
+                        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.country.includes('Australia') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'Australia')"> Australia</label>
+                    <label class="filter"><input type="checkbox" ${inspirationFilters.country.includes('United States') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'United States')"> United States</label>
+                </div>
+            </div>
+        `;
+    } else {
+        // Financial resources sidebar
+        return `
+            <div class="sidebar ${sidebarCollapsed ? 'collapsed' : ''}">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Filters</span>
+                    <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search resources..." 
+                           value="${searchQuery}" onkeyup="handleSearch(this.value)">
+                </div>
+                
+                <button class="reset-filters-btn ${hasActiveFilters() ? 'active' : ''}" onclick="resetFilters()">
+                    ${hasActiveFilters() ? 'Reset Filters' : 'No Filters Applied'}
+                </button>
+                
+                <div class="facet">
+                    <div class="facet-title">Category</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Category">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Government Benefits') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Government Benefits')"> Government Benefits</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Savings') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Savings')"> Savings Programs</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Grant') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Grant')"> Grants</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Scholarship') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Scholarship')"> Scholarships</label>
+                    <label class="filter"><input type="checkbox" ${filters.subcategory.includes('Insurance') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Insurance')"> Health Insurance</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Age Range</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Age">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('0-3') ? 'checked' : ''} onchange="toggleFilter('age', '0-3')"> Birth&#8211;3</label>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('3-5') ? 'checked' : ''} onchange="toggleFilter('age', '3-5')"> 3&#8211;5 Years</label>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('5-18') ? 'checked' : ''} onchange="toggleFilter('age', '5-18')"> 5&#8211;18 Years</label>
+                    <label class="filter"><input type="checkbox" ${filters.age.includes('18+') ? 'checked' : ''} onchange="toggleFilter('age', '18+')"> 18+ Adults</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Coverage</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Coverage">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.jurisdiction.includes('National') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'National')"> National</label>
+                    <label class="filter"><input type="checkbox" ${filters.jurisdiction.includes('Multi-State') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'Multi-State')"> Multi-State</label>
+                    <label class="filter"><input type="checkbox" ${filters.jurisdiction.includes('State') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'State')"> State</label>
+                </div>
+                
+                <div class="facet">
+                    <div class="facet-title">Income Limits</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Income">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${filters.income.includes('no') ? 'checked' : ''} onchange="toggleFilter('income', 'no')"> No Income Limits</label>
+                </div>
+            </div>
+        `;
+    }
+};
 
 const renderFooter = () => `
     <footer>
         <div class="footer-content">
-            <span class="footer-text">&copy; 2026 T21 Directory. All rights reserved.</span>
-            <span class="footer-text">Made with &#10084; for the DS community</span>
+            <span class="footer-text">&#169; 2026 T21 Directory. All rights reserved.</span>
+            <span class="footer-text">Made with &#10084;&#65039; for the DS community</span>
         </div>
     </footer>
 `;
 
-const renderFinancialSidebar = () => `
-    <div class="sidebar ${state.sidebarCollapsed ? 'collapsed' : ''}">
-        <div class="sidebar-header">
-            <span class="sidebar-title">Filters</span>
-            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&lsaquo;</button>
-        </div>
-        
-        <div class="search-box">
-            <input type="text" class="search-input" placeholder="Search resources..." 
-                   value="${state.searchQuery}" onkeyup="handleSearch(this.value)">
-        </div>
-        
-        <button class="reset-filters-btn ${hasActiveFilters() ? 'active' : ''}" onclick="resetFilters()">
-            ${hasActiveFilters() ? 'Reset Filters' : 'No Filters Applied'}
-        </button>
-        
-        <div class="facet">
-            <div class="facet-title">Category</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Category">
-                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.filters.subcategory.includes('Government Benefits') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Government Benefits')"> Government Benefits</label>
-            <label class="filter"><input type="checkbox" ${state.filters.subcategory.includes('Savings') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Savings')"> Savings Programs</label>
-            <label class="filter"><input type="checkbox" ${state.filters.subcategory.includes('Grant') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Grant')"> Grants</label>
-            <label class="filter"><input type="checkbox" ${state.filters.subcategory.includes('Scholarship') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Scholarship')"> Scholarships</label>
-            <label class="filter"><input type="checkbox" ${state.filters.subcategory.includes('Insurance') ? 'checked' : ''} onchange="toggleFilter('subcategory', 'Insurance')"> Health Insurance</label>
-        </div>
-        
-        <div class="facet">
-            <div class="facet-title">Age Range</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Age Range">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.filters.age.includes('0-3') ? 'checked' : ''} onchange="toggleFilter('age', '0-3')"> Birth&ndash;3</label>
-            <label class="filter"><input type="checkbox" ${state.filters.age.includes('3-5') ? 'checked' : ''} onchange="toggleFilter('age', '3-5')"> 3&ndash;5 Years</label>
-            <label class="filter"><input type="checkbox" ${state.filters.age.includes('5-18') ? 'checked' : ''} onchange="toggleFilter('age', '5-18')"> 5&ndash;18 Years</label>
-            <label class="filter"><input type="checkbox" ${state.filters.age.includes('18+') ? 'checked' : ''} onchange="toggleFilter('age', '18+')"> 18+ Adults</label>
-        </div>
-        
-        <div class="facet">
-            <div class="facet-title">Coverage</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Coverage">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.filters.jurisdiction.includes('National') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'National')"> National</label>
-            <label class="filter"><input type="checkbox" ${state.filters.jurisdiction.includes('Multi-State') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'Multi-State')"> Multi-State</label>
-            <label class="filter"><input type="checkbox" ${state.filters.jurisdiction.includes('State') ? 'checked' : ''} onchange="toggleFilter('jurisdiction', 'State')"> State</label>
-        </div>
-        
-        <div class="facet">
-            <div class="facet-title">Income Limits</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Income">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.filters.income.includes('no') ? 'checked' : ''} onchange="toggleFilter('income', 'no')"> No Income Limits</label>
-        </div>
-    </div>
-`;
-
-const renderTherapySidebar = () => `
-    <div class="sidebar ${state.sidebarCollapsed ? 'collapsed' : ''}">
-        <div class="sidebar-header">
-            <span class="sidebar-title">Filters</span>
-            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&lsaquo;</button>
-        </div>
-        
-        <div class="search-box">
-            <input type="text" class="search-input" placeholder="Search services..." 
-                   value="${state.searchQuery}" onkeyup="handleSearch(this.value)">
-        </div>
-        
-        <button class="reset-filters-btn ${hasActiveTherapyFilters() ? 'active' : ''}" onclick="resetTherapyFilters()">
-            ${hasActiveTherapyFilters() ? 'Reset Filters' : 'No Filters Applied'}
-        </button>
-        
-        <div class="facet">
-            <div class="facet-title">Service Type</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Service Type">
-                <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.serviceType.includes('DS Specialty Clinics') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'DS Specialty Clinics')"> DS Specialty Clinics</label>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.serviceType.includes('Speech') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'Speech')"> Speech Therapy</label>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.serviceType.includes('Physical') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'Physical')"> Physical Therapy</label>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.serviceType.includes('Occupational') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'Occupational')"> Occupational Therapy</label>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.serviceType.includes('Telehealth') ? 'checked' : ''} onchange="toggleTherapyFilter('serviceType', 'Telehealth')"> Telehealth Services</label>
-        </div>
-        
-        <div class="facet">
-            <div class="facet-title">Telehealth</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Telehealth">
-                <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.telehealth.includes('Yes') ? 'checked' : ''} onchange="toggleTherapyFilter('telehealth', 'Yes')"> Available</label>
-        </div>
-        
-        <div class="facet">
-            <div class="facet-title">Coverage</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Coverage">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.jurisdiction.includes('National') ? 'checked' : ''} onchange="toggleTherapyFilter('jurisdiction', 'National')"> National</label>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.jurisdiction.includes('Regional') ? 'checked' : ''} onchange="toggleTherapyFilter('jurisdiction', 'Regional')"> Regional</label>
-            <label class="filter"><input type="checkbox" ${state.therapyFilters.jurisdiction.includes('State') ? 'checked' : ''} onchange="toggleTherapyFilter('jurisdiction', 'State')"> State</label>
-        </div>
-    </div>
-`;
-
-const renderInspirationSidebar = () => `
-    <div class="sidebar ${state.sidebarCollapsed ? 'collapsed' : ''}">
-        <div class="sidebar-header">
-            <span class="sidebar-title">Filters</span>
-            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&lsaquo;</button>
-        </div>
-        
-        <button class="reset-filters-btn ${hasActiveInspirationFilters() ? 'active' : ''}" onclick="resetInspirationFilters()">
-            ${hasActiveInspirationFilters() ? 'Reset Filters' : 'No Filters Applied'}
-        </button>
-        
-        <div class="facet">
-            <div class="facet-title">Field</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Field">
-                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.inspirationFilters.field.includes('Artist') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Artist')"> Artist</label>
-            <label class="filter"><input type="checkbox" ${state.inspirationFilters.field.includes('Athlete') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Athlete')"> Athlete</label>
-            <label class="filter"><input type="checkbox" ${state.inspirationFilters.field.includes('Entrepreneur') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Entrepreneur')"> Entrepreneur</label>
-            <label class="filter"><input type="checkbox" ${state.inspirationFilters.field.includes('Modeling') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Modeling')"> Modeling</label>
-            <label class="filter"><input type="checkbox" ${state.inspirationFilters.field.includes('Performing Arts') ? 'checked' : ''} onchange="toggleInspirationFilter('field', 'Performing Arts')"> Performing Arts</label>
-        </div>
-        
-        <div class="facet">
-            <div class="facet-title">Country</div>
-            <button class="facet-icon" onclick="expandSidebar()" title="Country">
-                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            </button>
-            <label class="filter"><input type="checkbox" ${state.inspirationFilters.country.includes('United States') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'United States')"> United States</label>
-            <label class="filter"><input type="checkbox" ${state.inspirationFilters.country.includes('Australia') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'Australia')"> Australia</label>
-        </div>
-    </div>
-`;
-
-// ============== PAGE RENDERS ==============
-
+// ============== RENDER: HOME PAGE ==============
 const renderHomePage = () => `
     <div class="home-hero">
         <div class="home-hero-content">
             <h1>Resources for the Down Syndrome Community</h1>
             <p>A comprehensive directory of financial resources, healthcare services, and inspiring individuals. Built by the community, for the community.</p>
             <div class="home-hero-buttons">
-                <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Browse Resources &rarr;</a>
-                <a href="#" class="btn btn-secondary-light" onclick="navigate('inspiration'); return false;">Meet Inspiring Individuals &rarr;</a>
+                <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Browse Resources &#8594;</a>
+                <a href="#" class="btn btn-secondary-light" onclick="navigate('inspiration'); return false;">Meet Inspiring Individuals &#8594;</a>
             </div>
         </div>
     </div>
@@ -523,11 +499,11 @@ const renderHomePage = () => `
             <div class="stat-icon" style="background: var(--color-primary);">
                 <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
             </div>
-            <div class="stat-value">${financialData.length}</div>
+            <div class="stat-value">${resourcesData.length}</div>
             <div class="stat-label">Financial Resources</div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background: var(--color-therapy);">
+            <div class="stat-icon" style="background: #8b5cf6;">
                 <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
             </div>
             <div class="stat-value">${therapyData.length}</div>
@@ -535,14 +511,14 @@ const renderHomePage = () => `
         </div>
         <div class="stat-card">
             <div class="stat-icon" style="background: var(--color-secondary);">
-                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
             <div class="stat-value">${inspirationData.length}</div>
             <div class="stat-label">Inspiring Individuals</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon" style="background: var(--color-tertiary);">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             </div>
             <div class="stat-value">50</div>
             <div class="stat-label">States Covered</div>
@@ -552,65 +528,72 @@ const renderHomePage = () => `
     <div class="home-section">
         <div class="home-section-header">
             <h2>Explore the Directory</h2>
-            <p>Find the support you need, from financial assistance to inspiring role models.</p>
+            <p>Find the support you need, from financial assistance to healthcare to inspiring role models.</p>
         </div>
-        <div class="home-cards">
-            <a href="#" class="home-card" onclick="navigate('resources'); return false;">
-                <div class="home-card-icon" style="background: var(--color-primary);">
-                    <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        <div class="home-cards three-col">
+            <a href="#" class="home-card blue" onclick="navigate('resources'); return false;">
+                <div class="home-card-content">
+                    <div class="home-card-icon" style="background: var(--color-primary);">
+                        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                    <h3>Financial Resources</h3>
+                    <p>Discover ${resourcesData.length}+ grants, benefits, scholarships, and support programs.</p>
+                    <div class="home-card-tags">
+                        <span class="home-card-tag">Government Benefits</span>
+                        <span class="home-card-tag">Grants</span>
+                        <span class="home-card-tag">Scholarships</span>
+                    </div>
+                    <span class="home-card-link">Browse Resources &#8594;</span>
                 </div>
-                <h3>Financial Resources</h3>
-                <p>Discover ${financialData.length}+ grants, benefits, scholarships, and support programs for the Down syndrome community.</p>
-                <div class="home-card-tags">
-                    <span class="home-card-tag">Government Benefits</span>
-                    <span class="home-card-tag">Grants</span>
-                    <span class="home-card-tag">Scholarships</span>
-                </div>
-                <span class="home-card-link">Browse Resources &rarr;</span>
             </a>
-            <a href="#" class="home-card" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">
-                <div class="home-card-icon" style="background: var(--color-therapy);">
-                    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            <a href="#" class="home-card purple" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">
+                <div class="home-card-content">
+                    <div class="home-card-icon" style="background: #8b5cf6;">
+                        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    </div>
+                    <h3>Healthcare &amp; Therapy</h3>
+                    <p>Find ${therapyData.length}+ specialized clinics, therapy services, and providers.</p>
+                    <div class="home-card-tags">
+                        <span class="home-card-tag">DS Clinics</span>
+                        <span class="home-card-tag">Speech Therapy</span>
+                        <span class="home-card-tag">Telehealth</span>
+                    </div>
+                    <span class="home-card-link">Find Services &#8594;</span>
                 </div>
-                <h3>Healthcare &amp; Therapy</h3>
-                <p>Find ${therapyData.length}+ specialized clinics, therapy services, and healthcare providers experienced with Down syndrome.</p>
-                <div class="home-card-tags">
-                    <span class="home-card-tag">DS Clinics</span>
-                    <span class="home-card-tag">Speech Therapy</span>
-                    <span class="home-card-tag">Telehealth</span>
-                </div>
-                <span class="home-card-link">Find Services &rarr;</span>
             </a>
-            <a href="#" class="home-card" onclick="navigate('inspiration'); return false;">
-                <div class="home-card-icon" style="background: var(--color-secondary);">
-                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <a href="#" class="home-card teal" onclick="navigate('inspiration'); return false;">
+                <div class="home-card-content">
+                    <div class="home-card-icon" style="background: var(--color-secondary);">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3>Inspiring Individuals</h3>
+                    <p>Meet ${inspirationData.length}+ role models &#8212; athletes, artists, entrepreneurs, advocates.</p>
+                    <div class="home-card-tags">
+                        <span class="home-card-tag">Athletes</span>
+                        <span class="home-card-tag">Artists</span>
+                        <span class="home-card-tag">Entrepreneurs</span>
+                    </div>
+                    <span class="home-card-link">Meet Inspiring Individuals &#8594;</span>
                 </div>
-                <h3>Inspiring Individuals</h3>
-                <p>Meet ${inspirationData.length}+ role models making an impact &mdash; athletes, artists, entrepreneurs, advocates, and creators.</p>
-                <div class="home-card-tags">
-                    <span class="home-card-tag">Athletes</span>
-                    <span class="home-card-tag">Artists</span>
-                    <span class="home-card-tag">Entrepreneurs</span>
-                </div>
-                <span class="home-card-link">Meet Inspiring Individuals &rarr;</span>
             </a>
         </div>
     </div>
     ${renderFooter()}
 `;
 
+// ============== RENDER: RESOURCES PAGE ==============
 const renderResourcesPage = () => {
-    const isTherapy = state.currentResourceTab === 'therapy';
-    const filteredFinancial = getFilteredFinancial();
+    const isTherapy = currentResourceTab === 'therapy';
+    const filteredFinancial = getFilteredResources();
     const filteredTherapy = getFilteredTherapy();
-    const visibleFinancial = filteredFinancial.slice(0, state.resourcesVisible);
-    const visibleTherapy = filteredTherapy.slice(0, state.therapyVisible);
-    const hasMoreFinancial = filteredFinancial.length > state.resourcesVisible;
-    const hasMoreTherapy = filteredTherapy.length > state.therapyVisible;
+    const visibleFinancial = filteredFinancial.slice(0, resourcesVisible);
+    const visibleTherapy = filteredTherapy.slice(0, therapyVisible);
+    const hasMoreFinancial = filteredFinancial.length > resourcesVisible;
+    const hasMoreTherapy = filteredTherapy.length > therapyVisible;
     
     return `
         <div class="main-wrapper">
-            ${isTherapy ? renderTherapySidebar() : renderFinancialSidebar()}
+            ${renderSidebar(isTherapy ? 'therapy' : 'resources')}
             <div class="content">
                 <div class="page-header">
                     <h1 class="page-title">Resources Directory</h1>
@@ -618,18 +601,13 @@ const renderResourcesPage = () => {
                 </div>
                 
                 <div class="sub-tabs">
-                    <button class="sub-tab ${state.currentResourceTab === 'financial' ? 'active' : ''}" onclick="switchResourceTab('financial')">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-                            <line x1="12" y1="1" x2="12" y2="23"></line>
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
+                    <button class="sub-tab ${currentResourceTab === 'financial' ? 'active' : ''}" onclick="switchResourceTab('financial')">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         Financial &amp; Benefits
-                        <span class="tab-count">${financialData.length}</span>
+                        <span class="tab-count">${resourcesData.length}</span>
                     </button>
-                    <button class="sub-tab ${state.currentResourceTab === 'therapy' ? 'active' : ''}" onclick="switchResourceTab('therapy')">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                        </svg>
+                    <button class="sub-tab ${currentResourceTab === 'therapy' ? 'active' : ''}" onclick="switchResourceTab('therapy')">
+                        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                         Healthcare &amp; Therapy
                         <span class="tab-count">${therapyData.length}</span>
                     </button>
@@ -644,9 +622,34 @@ const renderResourcesPage = () => {
                         </div>
                     </div>
                     
-                    ${visibleTherapy.map(r => renderTherapyCard(r)).join('')}
+                    ${visibleTherapy.map(r => {
+                        const services = (r.subcategories || '').split(';').slice(0, 2).map(s => s.trim());
+                        const isTelehealth = (r.telehealth_available || '').toLowerCase().includes('yes');
+                        const isFree = (r.cost_type || '').toLowerCase() === 'free';
+                        const isExpert = (r.ds_experience_level || '').includes('Expert');
+                        
+                        return `
+                            <div class="card" onclick="navigate('detail', 'therapy', '${r.resource_id}')">
+                                <div class="card-image therapy">Healthcare</div>
+                                <div class="card-body">
+                                    <div class="card-title">${r.resource_name || ''}</div>
+                                    <div class="card-org">${r.organization_name || ''}</div>
+                                    <div class="card-desc">${r.short_description || ''}</div>
+                                    <div class="card-tags">
+                                        ${services.map(s => `<span class="card-tag therapy">${s}</span>`).join('')}
+                                        <span class="card-tag">${r.jurisdiction_level || 'National'}</span>
+                                    </div>
+                                </div>
+                                <div class="card-badges">
+                                    ${isTelehealth ? '<span class="info-badge telehealth">Telehealth</span>' : ''}
+                                    ${isFree ? '<span class="info-badge free">Free</span>' : ''}
+                                    ${isExpert ? '<span class="info-badge expert">DS Expert</span>' : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
                     
-                    ${hasMoreTherapy ? `<button class="load-more-btn" onclick="loadMoreTherapy()">Load More (${filteredTherapy.length - state.therapyVisible} remaining)</button>` : ''}
+                    ${hasMoreTherapy ? `<button class="load-more-btn" onclick="loadMoreTherapy()">LOAD MORE (${filteredTherapy.length - therapyVisible} remaining)</button>` : ''}
                 ` : `
                     <div class="results-header">
                         <span class="results-count">Showing ${visibleFinancial.length} of ${filteredFinancial.length} resources</span>
@@ -656,78 +659,49 @@ const renderResourcesPage = () => {
                         </div>
                     </div>
                     
-                    ${visibleFinancial.map(r => renderFinancialCard(r)).join('')}
+                    ${visibleFinancial.map(r => {
+                        const badge = getValueBadge(r);
+                        return `
+                            <div class="card" onclick="navigate('detail', 'financial', '${r.program_id}')">
+                                <div class="card-image">Financial</div>
+                                <div class="card-body">
+                                    <div class="card-title">${r.program_name || ''}</div>
+                                    <div class="card-org">${r.organization_type || ''}</div>
+                                    <div class="card-desc">${(r.program_description || '').substring(0, 150)}${(r.program_description || '').length > 150 ? '...' : ''}</div>
+                                    <div class="card-tags">
+                                        <span class="card-tag">${r.program_category || ''}</span>
+                                        <span class="card-tag">${r.geographic_coverage || ''}</span>
+                                        ${r.income_limit === 'None' || !r.income_limit ? '<span class="card-tag highlight">No Income Limits</span>' : ''}
+                                    </div>
+                                </div>
+                                <div class="card-amount">
+                                    <span class="card-amount-label">${badge.label}</span>
+                                    <span class="card-amount-value">${badge.value}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
                     
-                    ${hasMoreFinancial ? `<button class="load-more-btn" onclick="loadMoreResources()">Load More (${filteredFinancial.length - state.resourcesVisible} remaining)</button>` : ''}
+                    ${hasMoreFinancial ? `<button class="load-more-btn" onclick="loadMoreResources()">LOAD MORE (${filteredFinancial.length - resourcesVisible} remaining)</button>` : ''}
                 `}
             </div>
         </div>
     `;
 };
 
-const renderFinancialCard = (r) => {
-    const badge = getValueBadge(r);
-    const valueClass = badge.value.length > 10 ? 'small' : '';
-    return `
-        <div class="card" onclick="navigate('detail', 'financial', '${r.program_id}')">
-            <div class="card-image">Financial</div>
-            <div class="card-body">
-                <div class="card-title">${r.program_name || ''}</div>
-                <div class="card-org">${r.organization_type || ''}</div>
-                <div class="card-desc">${(r.program_description || '').substring(0, 150)}...</div>
-                <div class="card-tags">
-                    <span class="card-tag">${r.program_category || ''}</span>
-                    <span class="card-tag">${r.geographic_coverage || ''}</span>
-                    ${!r.income_limit || r.income_limit === 'None' ? '<span class="card-tag highlight">No Income Limits</span>' : ''}
-                </div>
-            </div>
-            <div class="card-value">
-                <span class="card-value-label">${badge.label}</span>
-                <span class="card-value-amount ${valueClass}">${badge.value}</span>
-            </div>
-        </div>
-    `;
-};
-
-const renderTherapyCard = (r) => {
-    const services = (r.subcategories || '').split(';').slice(0, 2).map(s => s.trim());
-    const isTelehealth = (r.telehealth_available || '').toLowerCase().includes('yes');
-    const isFree = (r.cost_type || '').toLowerCase() === 'free';
-    const isExpert = (r.ds_experience_level || '').includes('Expert');
-    
-    return `
-        <div class="card" onclick="navigate('detail', 'therapy', '${r.resource_id}')">
-            <div class="card-image therapy">Healthcare</div>
-            <div class="card-body">
-                <div class="card-title">${r.resource_name || ''}</div>
-                <div class="card-org">${r.organization_name || ''} &middot; ${r.organization_type || ''}</div>
-                <div class="card-desc">${r.short_description || ''}</div>
-                <div class="card-tags">
-                    ${services.map(s => `<span class="card-tag therapy">${s}</span>`).join('')}
-                    <span class="card-tag">${r.jurisdiction_level || 'National'}</span>
-                </div>
-            </div>
-            <div class="card-badges">
-                ${isTelehealth ? '<span class="info-badge telehealth">&#128249; Telehealth</span>' : ''}
-                ${isFree ? '<span class="info-badge free">&#10003; Free</span>' : ''}
-                ${isExpert ? '<span class="info-badge expert">&#9733; DS Expert</span>' : ''}
-            </div>
-        </div>
-    `;
-};
-
+// ============== RENDER: INSPIRATION PAGE ==============
 const renderInspirationPage = () => {
     const filtered = getFilteredInspiration();
-    const visible = filtered.slice(0, state.inspirationVisible);
-    const hasMore = filtered.length > state.inspirationVisible;
+    const visible = filtered.slice(0, inspirationVisible);
+    const hasMore = filtered.length > inspirationVisible;
     
     return `
         <div class="main-wrapper">
-            ${renderInspirationSidebar()}
+            ${renderSidebar('inspiration')}
             <div class="content">
                 <div class="page-header">
                     <h1 class="page-title">Inspiring Individuals</h1>
-                    <p class="page-subtitle">Meet role models making an impact &mdash; athletes, artists, entrepreneurs, advocates, and more.</p>
+                    <p class="page-subtitle">Meet role models making an impact &#8212; athletes, artists, entrepreneurs, advocates, and more.</p>
                 </div>
                 
                 <div class="results-header">
@@ -746,7 +720,7 @@ const renderInspirationPage = () => {
                             <div class="inspiration-card" onclick="navigate('detail', 'inspiration', '${p.profile_id}')">
                                 <div class="inspiration-card-header">
                                     <div class="inspiration-avatar">${getInitials(p.full_name)}</div>
-                                    <div>
+                                    <div class="inspiration-card-header-text">
                                         <div class="inspiration-name">${p.known_as___stage_name || p.full_name}</div>
                                         <div class="inspiration-location">${location}</div>
                                     </div>
@@ -760,190 +734,118 @@ const renderInspirationPage = () => {
                     }).join('')}
                 </div>
                 
-                ${hasMore ? `<button class="load-more-btn" onclick="loadMoreInspiration()">Load More (${filtered.length - state.inspirationVisible} remaining)</button>` : ''}
+                ${hasMore ? `<button class="load-more-btn" onclick="loadMoreInspiration()">LOAD MORE (${filtered.length - inspirationVisible} remaining)</button>` : ''}
             </div>
         </div>
     `;
 };
 
-const renderAboutPage = () => `
-    <div class="about-page">
-        <div class="about-hero">
-            <h1>About T21</h1>
-            <p>Building the resource we wished existed when our journey began.</p>
-        </div>
-        
-        <div class="about-content">
-            <div class="about-section">
-                <h2>Our Mission</h2>
-                <p>T21 exists to ensure every family touched by Down syndrome has access to the resources, support, and inspiration they need to thrive &mdash; regardless of where they live, their income level, or their prior knowledge of available benefits.</p>
-                
-                <div class="about-pillars">
-                    <div class="about-pillar">
-                        <div class="about-pillar-icon" style="background: var(--color-primary);">
-                            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        </div>
-                        <h3>Financial Foundation</h3>
-                        <p>Navigate benefits, grants, and scholarships that can provide significant support over your child's lifetime.</p>
-                    </div>
-                    <div class="about-pillar">
-                        <div class="about-pillar-icon" style="background: var(--color-therapy);">
-                            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                        </div>
-                        <h3>Healthcare Access</h3>
-                        <p>Find DS specialty clinics, therapy services, and healthcare providers who understand your child's unique needs.</p>
-                    </div>
-                    <div class="about-pillar">
-                        <div class="about-pillar-icon" style="background: var(--color-secondary);">
-                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                        </div>
-                        <h3>Community &amp; Inspiration</h3>
-                        <p>Connect with role models and families who show what's possible and remind us we're not alone.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="about-section">
-                <h2>Our Story</h2>
-                <p>T21 was born from our own family's journey. We have two boys &mdash; ages 9 and 6. Our younger son has Down syndrome, and from the moment of his diagnosis, we dove headfirst into learning everything we could to give him the best possible life.</p>
-                <p>We've spent countless hours researching therapies, applying for benefits, advocating at school, finding inclusive activities, and connecting with other families. It's nearly a full-time job &mdash; and we're lucky to have the time and resources to do it.</p>
-                <p>But we kept thinking: what about families who don't have these advantages? What about the single parent working two jobs? The family in a rural area? The parents who don't know their child automatically qualifies for SSI?</p>
-                <p>We wanted to build the tool we wished existed &mdash; a comprehensive, searchable directory that any family could use to find the support they need.</p>
-            </div>
-            
-            <div class="about-cta">
-                <h2>Join Us</h2>
-                <p>T21 is a community effort. We're building this directory together &mdash; parents, advocates, organizations, and allies.</p>
-                <div class="about-cta-buttons">
-                    <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Explore Resources &rarr;</a>
-                    <button class="btn btn-secondary">Submit a Resource</button>
-                </div>
-            </div>
-        </div>
-        ${renderFooter()}
-    </div>
-`;
-
-// ============== DETAIL PAGES ==============
-
+// ============== RENDER: DETAIL PAGES ==============
 const renderFinancialDetail = () => {
-    const r = financialData.find(res => res.program_id === state.currentDetailId);
+    const r = resourcesData.find(res => res.program_id === currentDetailId);
     if (!r) return '<div class="detail-page"><div class="detail-content">Resource not found</div></div>';
     
     const badge = getValueBadge(r);
-    const ageRange = r.age_range_min !== undefined ? 
-        `${r.age_range_min === 0 ? 'Birth' : r.age_range_min} \u2013 ${r.age_range_max >= 99 ? 'All ages' : r.age_range_max + ' years'}` : 
-        'All ages';
+    const ageMin = r.age_range_min || 0;
+    const ageMax = r.age_range_max || 99;
+    const ageRange = `${ageMin === 0 ? 'Birth' : ageMin} \u2013 ${ageMax >= 99 ? 'All ages' : ageMax + ' years'}`;
     
     return `
         <div class="detail-page">
             <div class="detail-back-bar">
                 <div class="detail-back-bar-content">
-                    <a href="#" class="back-link" onclick="navigate('resources'); return false;">&larr; Back to Resources</a>
+                    <a href="#" class="back-link" onclick="navigate('resources'); return false;">&#8592; Back to Resources</a>
                 </div>
             </div>
             <div class="detail-content">
-                <div class="detail-header">
-                    <div class="detail-header-main">
-                        <div class="detail-image">Financial</div>
-                        <div>
-                            <div class="detail-tags">
-                                <span class="detail-tag">${r.program_category || ''}</span>
-                                <span class="detail-tag">${r.geographic_coverage || ''}</span>
-                                ${!r.income_limit || r.income_limit === 'None' ? '<span class="detail-tag green">No Income Limits</span>' : ''}
-                            </div>
-                            <h1 class="detail-title">${r.program_name}</h1>
-                            <p class="detail-org">${r.organization_type || ''}</p>
-                        </div>
-                    </div>
-                    <div class="detail-header-actions">
-                        ${r.website ? `<a href="${r.website.startsWith('http') ? r.website : 'https://' + r.website}" target="_blank" class="btn btn-primary">Visit Website &rarr;</a>` : ''}
-                        ${r.phone ? `<a href="tel:${r.phone.replace(/[^0-9]/g, '')}" class="btn btn-secondary">&#128222; ${r.phone}</a>` : ''}
-                    </div>
+                <div class="detail-image-banner">
+                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.program_name}">` : ''}
                 </div>
                 
-                <div class="detail-body">
-                    <div class="detail-main">
-                        <div class="detail-section">
-                            <h2>Overview</h2>
-                            <div class="detail-text">
-                                ${(r.program_description || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
-                            </div>
+                <h1 class="detail-title">${r.program_name}</h1>
+                <p class="detail-org">${r.organization_type || ''}</p>
+                
+                <div class="detail-amount-box">
+                    <div class="detail-amount-label">${badge.label}</div>
+                    <div class="detail-amount-value">${badge.value}</div>
+                    ${r.annual_cap ? `<div style="font-size: 0.85rem; color: var(--color-gray-text); margin-top: 0.25rem;">Up to $${Number(r.annual_cap).toLocaleString()}/year</div>` : ''}
+                </div>
+                
+                <div class="detail-tags">
+                    <span class="detail-tag">${r.program_category || ''}</span>
+                    <span class="detail-tag">${r.geographic_coverage || ''}</span>
+                    ${!r.income_limit || r.income_limit === 'None' ? '<span class="detail-tag green">No Income Limits</span>' : ''}
+                </div>
+                
+                <div class="detail-description">
+                    ${(r.program_description || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                </div>
+                
+                <div class="detail-actions">
+                    ${r.website ? `<a href="${r.website.startsWith('http') ? r.website : 'https://' + r.website}" target="_blank" class="btn btn-primary">Visit Website &#8594;</a>` : ''}
+                    ${r.phone ? `<a href="tel:${r.phone.replace(/[^0-9]/g, '')}" class="btn btn-secondary">&#128222; ${r.phone}</a>` : ''}
+                </div>
+                
+                ${r['key_features_&_benefits'] ? `
+                    <div class="detail-section">
+                        <h2 class="detail-section-title">Key Features &amp; Benefits</h2>
+                        <div class="detail-description">
+                            <p style="white-space: pre-line;">${r['key_features_&_benefits']}</p>
                         </div>
-                        
-                        ${r['key_features_&_benefits'] ? `
-                            <div class="detail-section">
-                                <h2>Key Features &amp; Benefits</h2>
-                                <div class="detail-features">${(r['key_features_&_benefits'] || '').replace(/\\u2022/g, '\u2022')}</div>
-                            </div>
-                        ` : ''}
-                        
-                        ${r.application_process ? `
-                            <div class="detail-section">
-                                <h2>How to Apply</h2>
-                                <div class="detail-text">
-                                    ${(r.application_process || '').split('\n').map(p => `<p>${p}</p>`).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        ${r['real-world_context'] ? `
-                            <div class="detail-note-card">
-                                <h3>&#128161; Important Notes</h3>
-                                ${(r['real-world_context'] || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                    </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Eligibility &amp; Details</h2>
+                    <div class="detail-grid">
+                        <div class="detail-grid-item">
+                            <label>Age Range</label>
+                            <span>${ageRange}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Application Deadline</label>
+                            <span>${r.application_deadline || 'Rolling'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Income Limits</label>
+                            <span>${!r.income_limit || r.income_limit === 'None' ? 'None' : (r.income_limit_details || r.income_limit || 'See details')}</span>
+                        </div>
+                        ${r.processing_time ? `
+                            <div class="detail-grid-item">
+                                <label>Processing Time</label>
+                                <span>${r.processing_time}</span>
                             </div>
                         ` : ''}
                     </div>
                     
-                    <div class="detail-sidebar-info">
-                        <div class="detail-sidebar-card">
-                            <h3>Quick Info</h3>
-                            <div class="detail-grid">
-                                <div class="detail-grid-item">
-                                    <label>${badge.label}</label>
-                                    <span>${badge.value}</span>
-                                </div>
-                                ${r.annual_cap ? `
-                                    <div class="detail-grid-item">
-                                        <label>Annual Cap</label>
-                                        <span>$${Number(r.annual_cap).toLocaleString()}</span>
-                                    </div>
-                                ` : ''}
-                                <div class="detail-grid-item">
-                                    <label>Age Range</label>
-                                    <span>${ageRange}</span>
-                                </div>
-                                <div class="detail-grid-item">
-                                    <label>Coverage</label>
-                                    <span>${r.geographic_coverage || 'National'}</span>
-                                </div>
-                                <div class="detail-grid-item">
-                                    <label>Income Limits</label>
-                                    <span>${r.income_limit || 'None'}</span>
-                                </div>
-                                ${r.application_deadline ? `
-                                    <div class="detail-grid-item">
-                                        <label>Deadline</label>
-                                        <span>${r.application_deadline}</span>
-                                    </div>
-                                ` : ''}
-                                ${r.processing_time ? `
-                                    <div class="detail-grid-item">
-                                        <label>Processing Time</label>
-                                        <span>${r.processing_time}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
+                    ${r.diagnosis_required ? `
+                        <div class="detail-info-item">
+                            <label>Diagnosis Required</label>
+                            <span>${r.diagnosis_required}</span>
                         </div>
-                    </div>
+                    ` : ''}
+                    
+                    ${r.covered_expenses ? `
+                        <div class="detail-info-item">
+                            <label>Covered Expenses</label>
+                            <span>${r.covered_expenses}</span>
+                        </div>
+                    ` : ''}
                 </div>
+                
+                ${r['real-world_context'] ? `
+                    <div class="detail-note-card">
+                        <h3>&#128161; Important Notes</h3>
+                        ${r['real-world_context'].split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
 };
 
 const renderTherapyDetail = () => {
-    const r = therapyData.find(res => res.resource_id === state.currentDetailId);
+    const r = therapyData.find(res => res.resource_id === currentDetailId);
     if (!r) return '<div class="detail-page"><div class="detail-content">Resource not found</div></div>';
     
     const services = (r.subcategories || '').split(';').map(s => s.trim()).filter(Boolean);
@@ -952,103 +854,86 @@ const renderTherapyDetail = () => {
         <div class="detail-page">
             <div class="detail-back-bar">
                 <div class="detail-back-bar-content">
-                    <a href="#" class="back-link" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">&larr; Back to Healthcare &amp; Therapy</a>
+                    <a href="#" class="back-link" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">&#8592; Back to Healthcare &amp; Therapy</a>
                 </div>
             </div>
             <div class="detail-content">
-                <div class="detail-header">
-                    <div class="detail-header-main">
-                        <div class="detail-image therapy">Healthcare</div>
-                        <div>
-                            <div class="detail-tags">
-                                ${services.slice(0, 2).map(s => `<span class="detail-tag therapy">${s}</span>`).join('')}
-                                <span class="detail-tag">${r.jurisdiction_level || 'National'}</span>
-                            </div>
-                            <h1 class="detail-title">${r.resource_name}</h1>
-                            <p class="detail-org">${r.organization_name || ''} &middot; ${r.organization_type || ''}</p>
+                <div class="detail-image-banner" style="background: linear-gradient(135deg, #8B5CF6 0%, #c4b5fd 100%);">
+                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.resource_name}">` : ''}
+                </div>
+                
+                <h1 class="detail-title">${r.resource_name}</h1>
+                <p class="detail-org">${r.organization_name || ''} &#8226; ${r.organization_type || ''}</p>
+                
+                <div class="detail-tags">
+                    ${services.slice(0, 3).map(s => `<span class="detail-tag therapy">${s}</span>`).join('')}
+                    <span class="detail-tag">${r.jurisdiction_level || 'National'}</span>
+                </div>
+                
+                <div class="detail-description">
+                    <p>${r.short_description || ''}</p>
+                    ${(r.full_description || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                </div>
+                
+                <div class="detail-actions">
+                    ${r.website ? `<a href="${r.website.startsWith('http') ? r.website : 'https://' + r.website}" target="_blank" class="btn btn-primary">Visit Website &#8594;</a>` : ''}
+                    ${r.phone ? `<a href="tel:${r.phone.replace(/[^0-9]/g, '')}" class="btn btn-secondary">&#128222; ${r.phone}</a>` : ''}
+                </div>
+                
+                ${r.key_features ? `
+                    <div class="detail-section">
+                        <h2 class="detail-section-title">Key Features</h2>
+                        <div class="detail-description">
+                            <p style="white-space: pre-line;">${r.key_features}</p>
                         </div>
                     </div>
-                    <div class="detail-header-actions">
-                        ${r.website ? `<a href="${r.website.startsWith('http') ? r.website : 'https://' + r.website}" target="_blank" class="btn btn-primary">Visit Website &rarr;</a>` : ''}
-                        ${r.phone ? `<a href="tel:${r.phone.replace(/[^0-9]/g, '')}" class="btn btn-secondary">&#128222; ${r.phone}</a>` : ''}
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Service Details</h2>
+                    <div class="detail-grid">
+                        <div class="detail-grid-item">
+                            <label>DS Experience</label>
+                            <span>${r.ds_experience_level || 'Experienced'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Cost</label>
+                            <span>${r.cost_type || 'Contact for info'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Telehealth</label>
+                            <span>${r.telehealth_available || 'Contact provider'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Medicaid Accepted</label>
+                            <span>${r.medicaid_accepted || 'Contact provider'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Coverage Area</label>
+                            <span>${r.jurisdiction_level || 'National'}</span>
+                        </div>
+                        ${r.states_available ? `
+                            <div class="detail-grid-item">
+                                <label>States Served</label>
+                                <span>${r.states_available}</span>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
                 
-                <div class="detail-body">
-                    <div class="detail-main">
-                        <div class="detail-section">
-                            <h2>Overview</h2>
-                            <div class="detail-text">
-                                <p>${r.short_description || ''}</p>
-                                ${(r.full_description || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
-                            </div>
-                        </div>
-                        
-                        ${r.key_features ? `
-                            <div class="detail-section">
-                                <h2>Key Features</h2>
-                                <div class="detail-features">${(r.key_features || '').replace(/\\u2022/g, '\u2022')}</div>
-                            </div>
-                        ` : ''}
-                        
-                        ${services.length ? `
-                            <div class="detail-section">
-                                <h2>Services Offered</h2>
-                                <div class="card-tags">
-                                    ${services.map(s => `<span class="card-tag therapy">${s}</span>`).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        ${r.practical_notes ? `
-                            <div class="detail-note-card">
-                                <h3>&#128161; Important Notes</h3>
-                                ${(r.practical_notes || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
-                            </div>
-                        ` : ''}
+                ${r.practical_notes ? `
+                    <div class="detail-note-card">
+                        <h3>&#128161; Important Notes</h3>
+                        ${r.practical_notes.split('\n\n').map(p => `<p>${p}</p>`).join('')}
                     </div>
-                    
-                    <div class="detail-sidebar-info">
-                        <div class="detail-sidebar-card">
-                            <h3>Quick Info</h3>
-                            <div class="detail-grid">
-                                <div class="detail-grid-item">
-                                    <label>DS Experience</label>
-                                    <span>${r.ds_experience_level || 'Experienced'}</span>
-                                </div>
-                                <div class="detail-grid-item">
-                                    <label>Cost</label>
-                                    <span>${r.cost_type || 'Contact for info'}</span>
-                                </div>
-                                <div class="detail-grid-item">
-                                    <label>Telehealth</label>
-                                    <span>${r.telehealth_available || 'Contact provider'}</span>
-                                </div>
-                                <div class="detail-grid-item">
-                                    <label>Medicaid</label>
-                                    <span>${r.medicaid_accepted || 'Contact provider'}</span>
-                                </div>
-                                <div class="detail-grid-item">
-                                    <label>Coverage</label>
-                                    <span>${r.jurisdiction_level || 'National'}</span>
-                                </div>
-                                ${r.states_available ? `
-                                    <div class="detail-grid-item">
-                                        <label>States</label>
-                                        <span>${r.states_available}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                ` : ''}
             </div>
         </div>
     `;
 };
 
 const renderInspirationDetail = () => {
-    const p = inspirationData.find(prof => prof.profile_id === state.currentDetailId);
+    const p = inspirationData.find(prof => prof.profile_id === currentDetailId);
     if (!p) return '<div class="detail-page"><div class="detail-content">Profile not found</div></div>';
     
     const fieldColor = getFieldColor(p.primary_field);
@@ -1059,114 +944,170 @@ const renderInspirationDetail = () => {
         <div class="detail-page">
             <div class="detail-back-bar">
                 <div class="detail-back-bar-content">
-                    <a href="#" class="back-link" onclick="navigate('inspiration'); return false;">&larr; Back to Inspiration</a>
+                    <a href="#" class="back-link" onclick="navigate('inspiration'); return false;">&#8592; Back to Inspiration</a>
                 </div>
             </div>
             <div class="detail-content">
-                <div class="detail-header">
-                    <div class="detail-header-main">
-                        <div class="inspiration-avatar" style="width: 80px; height: 80px; font-size: 1.5rem;">${getInitials(p.full_name)}</div>
-                        <div>
-                            <div class="detail-tags">
-                                <span class="detail-tag" style="background: ${fieldColor.bg}; color: ${fieldColor.text};">${normalizeField(p.primary_field)}</span>
-                                ${p.secondary_fields ? `<span class="detail-tag">${p.secondary_fields}</span>` : ''}
-                            </div>
-                            <h1 class="detail-title">${displayName}</h1>
-                            <p class="detail-org">${location}</p>
+                <div class="inspiration-detail-header">
+                    <div class="inspiration-detail-banner"></div>
+                    <div class="inspiration-detail-profile">
+                        <div class="inspiration-detail-avatar">${getInitials(p.full_name)}</div>
+                        <h1 class="inspiration-detail-name">${displayName}</h1>
+                        ${p.full_name !== displayName ? `<p class="inspiration-detail-subname">${p.full_name}</p>` : ''}
+                        <div class="inspiration-detail-meta">
+                            <span>&#128205; ${location}</span>
+                            ${p.active_since ? `<span>&#128197; Active since ${p.active_since}</span>` : ''}
                         </div>
-                    </div>
-                    <div class="detail-header-actions">
-                        ${p.website ? `<a href="${p.website.startsWith('http') ? p.website : 'https://' + p.website}" target="_blank" class="btn btn-primary">Visit Website &rarr;</a>` : ''}
-                        ${p.instagram ? `<a href="${p.instagram.startsWith('http') ? p.instagram : 'https://instagram.com/' + p.instagram}" target="_blank" class="btn btn-secondary">Instagram</a>` : ''}
+                        <div class="inspiration-detail-links">
+                            ${p.website ? `<a href="${p.website.startsWith('http') ? p.website : 'https://' + p.website}" target="_blank" class="social-link">&#127760; Website</a>` : ''}
+                            ${p.instagram ? `<a href="${p.instagram.startsWith('http') ? p.instagram : 'https://instagram.com/' + p.instagram}" target="_blank" class="social-link">&#128247; Instagram</a>` : ''}
+                            ${p.tiktok ? `<a href="${p.tiktok.startsWith('http') ? p.tiktok : 'https://tiktok.com/@' + p.tiktok}" target="_blank" class="social-link">TikTok</a>` : ''}
+                            ${p.youtube ? `<a href="${p.youtube}" target="_blank" class="social-link">&#9658; YouTube</a>` : ''}
+                        </div>
+                        <div class="inspiration-detail-badges">
+                            <span class="inspiration-badge" style="background: ${fieldColor.bg}; color: ${fieldColor.text};">${normalizeField(p.primary_field)}</span>
+                            ${p.secondary_fields ? `<span class="inspiration-badge" style="background: #f3f4f6; color: #374151;">${p.secondary_fields}</span>` : ''}
+                            ${p.speaking_available === 'Yes' ? `<span class="inspiration-badge" style="background: #dbeafe; color: #1d4ed8;">&#127908; Speaker</span>` : ''}
+                        </div>
                     </div>
                 </div>
                 
-                <div class="detail-body">
-                    <div class="detail-main">
-                        <div class="detail-section">
-                            <h2>About</h2>
-                            <div class="detail-text">
-                                <p>${p.short_bio || ''}</p>
-                            </div>
-                        </div>
-                        
-                        ${p.specific_achievements || p.key_accomplishments ? `
-                            <div class="detail-section">
-                                <h2>Achievements</h2>
-                                <div class="detail-text">
-                                    <p>${p.specific_achievements || p.key_accomplishments || ''}</p>
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        ${p.notable_quotes ? `
-                            <div class="detail-note-card" style="background: ${fieldColor.bg}; border-color: ${fieldColor.text}40;">
-                                <p style="font-size: 1.25rem; font-style: italic; margin: 0;">"${p.notable_quotes}"</p>
-                                <p style="margin-top: 0.75rem; margin-bottom: 0; font-weight: 600;">&mdash; ${displayName}</p>
-                            </div>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="detail-sidebar-info">
-                        <div class="detail-sidebar-card">
-                            <h3>Quick Info</h3>
-                            <div class="detail-grid">
-                                <div class="detail-grid-item">
-                                    <label>Field</label>
-                                    <span>${p.primary_field || ''}</span>
-                                </div>
-                                <div class="detail-grid-item">
-                                    <label>Location</label>
-                                    <span>${location}</span>
-                                </div>
-                                ${p.active_since ? `
-                                    <div class="detail-grid-item">
-                                        <label>Active Since</label>
-                                        <span>${p.active_since}</span>
-                                    </div>
-                                ` : ''}
-                                ${p.speaking_available === 'Yes' ? `
-                                    <div class="detail-grid-item">
-                                        <label>Speaking</label>
-                                        <span>Available</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
+                <div class="detail-section">
+                    <h2 class="detail-section-title">About</h2>
+                    <div class="detail-description">
+                        <p>${p.short_bio || ''}</p>
                     </div>
                 </div>
+                
+                ${p.specific_achievements || p.key_accomplishments ? `
+                    <div class="detail-section">
+                        <h2 class="detail-section-title">Achievements</h2>
+                        <div class="detail-description">
+                            <p>${p.specific_achievements || p.key_accomplishments || ''}</p>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${p.notable_quotes ? `
+                    <div class="quote-card">
+                        <blockquote>"${p.notable_quotes}"</blockquote>
+                        <cite>&#8212; ${displayName}</cite>
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
 };
 
-// ============== MAIN RENDER ==============
+// ============== RENDER: ABOUT PAGE ==============
+const renderAboutPage = () => `
+    <div class="about-page" style="margin-top: 70px;">
+        <div class="about-hero">
+            <div class="about-hero-content">
+                <h1>About T21</h1>
+                <p>Building the resource we wished existed when our journey began.</p>
+            </div>
+        </div>
+        
+        <div class="about-content">
+            <div class="about-section">
+                <h2>Our Mission</h2>
+                <p>T21 exists to ensure every family touched by Down syndrome has access to the resources, support, and inspiration they need to thrive &#8212; regardless of where they live, their income level, or their prior knowledge of available benefits.</p>
+                
+                <div class="about-pillars">
+                    <div class="about-pillar">
+                        <div class="about-pillar-icon" style="background: var(--color-primary);">
+                            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <h3>Financial Foundation</h3>
+                        <p>Navigate benefits, grants, and scholarships that can provide significant support.</p>
+                    </div>
+                    <div class="about-pillar">
+                        <div class="about-pillar-icon" style="background: #8b5cf6;">
+                            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                        </div>
+                        <h3>Healthcare Access</h3>
+                        <p>Find DS specialty clinics, therapy services, and healthcare providers.</p>
+                    </div>
+                    <div class="about-pillar">
+                        <div class="about-pillar-icon" style="background: var(--color-secondary);">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        </div>
+                        <h3>Community &amp; Inspiration</h3>
+                        <p>Connect with role models and families who show what's possible.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="about-section about-personal">
+                <h2>Our Story</h2>
+                <p>T21 was born from our own family's journey. We have two boys &#8212; ages 9 and 6. Our younger son has Down syndrome, and from the moment of his diagnosis, we dove headfirst into learning everything we could to give him the best possible life.</p>
+                <p>We've spent countless hours researching therapies, applying for benefits, advocating at school, finding inclusive activities, and connecting with other families. It's nearly a full-time job &#8212; and we're lucky to have the time and resources to do it.</p>
+                <p>But we kept thinking: what about families who don't have these advantages? What about the single parent working two jobs? The family in a rural area? The parents who don't know their child automatically qualifies for SSI?</p>
+                <p>We wanted to build the tool we wished existed &#8212; a comprehensive, searchable directory that any family could use to find the support they need.</p>
+            </div>
+            
+            <div class="about-cta">
+                <h2>Join Us</h2>
+                <p>T21 is a community effort. We're building this directory together &#8212; parents, advocates, organizations, and allies.</p>
+                <div class="about-cta-buttons">
+                    <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Explore Resources &#8594;</a>
+                    <button class="btn btn-secondary">Submit a Resource</button>
+                </div>
+            </div>
+        </div>
+        ${renderFooter()}
+    </div>
+`;
 
+// ============== MAIN RENDER ==============
 const render = () => {
     let content = '';
     
-    if (state.currentPage === 'detail') {
-        if (state.currentDetailType === 'financial') {
+    if (currentPage === 'detail') {
+        if (currentDetailType === 'financial') {
             content = renderFinancialDetail();
-        } else if (state.currentDetailType === 'therapy') {
+        } else if (currentDetailType === 'therapy') {
             content = renderTherapyDetail();
-        } else if (state.currentDetailType === 'inspiration') {
+        } else if (currentDetailType === 'inspiration') {
             content = renderInspirationDetail();
         }
-    } else if (state.currentPage === 'resources') {
+    } else if (currentPage === 'resources') {
         content = renderResourcesPage();
-    } else if (state.currentPage === 'inspiration') {
+    } else if (currentPage === 'inspiration') {
         content = renderInspirationPage();
-    } else if (state.currentPage === 'about') {
+    } else if (currentPage === 'about') {
         content = renderAboutPage();
     } else {
         content = renderHomePage();
     }
     
-    document.getElementById('app').innerHTML = `
-        ${renderHeader()}
-        ${state.currentPage === 'home' || state.currentPage === 'about' ? `<main style="margin-top: 70px;">${content}</main>` : content}
+    const header = `
+        <header>
+            <div class="header-content">
+                <a href="#" class="logo" onclick="navigate('home'); return false;">T21</a>
+                <nav>
+                    <a href="#" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); return false;">Home</a>
+                    <a href="#" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); return false;">Resources</a>
+                    <a href="#" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); return false;">Inspiration</a>
+                    <a href="#" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); return false;">About</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Give</a>
+                </nav>
+                <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</button>
+            </div>
+        </header>
+        <div class="mobile-menu-overlay" id="mobileMenu">
+            <a href="#" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); closeMenu(); return false;">Home</a>
+            <a href="#" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); closeMenu(); return false;">Resources</a>
+            <a href="#" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); closeMenu(); return false;">Inspiration</a>
+            <a href="#" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); closeMenu(); return false;">About</a>
+            <a href="#" onclick="closeMenu();">Contact</a>
+            <a href="#" onclick="closeMenu();">Give</a>
+        </div>
     `;
+    
+    document.getElementById('app').innerHTML = header + (currentPage === 'home' ? `<main style="margin-top: 70px;">${content}</main>` : content);
 };
 
 // ============== INITIALIZE ==============
