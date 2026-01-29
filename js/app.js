@@ -348,12 +348,11 @@ const renderSidebar = (type) => {
                     <span class="sidebar-title">Filters</span>
                     <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
                 </div>
-                
-                <div class="search-box">
-                    <input type="text" id="sidebar-search-input" class="search-input" placeholder="Search services..."
-                           value="${searchQuery}" oninput="handleSearch(this.value)">
+
+                <div class="search-box" id="search-box-container">
+                    <!-- Search input is created programmatically to persist across renders -->
                 </div>
-                
+
                 <button class="reset-filters-btn ${hasActiveTherapyFilters() ? 'active' : ''}" onclick="resetTherapyFilters()">
                     ${hasActiveTherapyFilters() ? 'Reset Filters' : 'No Filters Applied'}
                 </button>
@@ -431,11 +430,10 @@ const renderSidebar = (type) => {
                     <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
                 </div>
                 
-                <div class="search-box">
-                    <input type="text" id="sidebar-search-input" class="search-input" placeholder="Search resources..."
-                           value="${searchQuery}" oninput="handleSearch(this.value)">
+                <div class="search-box" id="search-box-container">
+                    <!-- Search input is created programmatically to persist across renders -->
                 </div>
-                
+
                 <button class="reset-filters-btn ${hasActiveFilters() ? 'active' : ''}" onclick="resetFilters()">
                     ${hasActiveFilters() ? 'Reset Filters' : 'No Filters Applied'}
                 </button>
@@ -1096,17 +1094,26 @@ const renderAboutPage = () => `
     </div>
 `;
 
+// Persistent search input element (never destroyed)
+let persistentSearchInput = null;
+
+// Create the persistent search input once
+const getOrCreateSearchInput = () => {
+    if (!persistentSearchInput) {
+        persistentSearchInput = document.createElement('input');
+        persistentSearchInput.type = 'text';
+        persistentSearchInput.id = 'sidebar-search-input';
+        persistentSearchInput.className = 'search-input';
+        persistentSearchInput.placeholder = 'Search...';
+        persistentSearchInput.addEventListener('input', (e) => {
+            handleSearch(e.target.value);
+        });
+    }
+    return persistentSearchInput;
+};
+
 // ============== MAIN RENDER ==============
 const render = () => {
-    // Save search input state before render
-    const oldSearchInput = document.getElementById('sidebar-search-input');
-    const searchWasFocused = oldSearchInput && (
-        document.activeElement === oldSearchInput ||
-        document.activeElement?.closest('.sidebar')
-    );
-    const searchValue = oldSearchInput ? oldSearchInput.value : searchQuery;
-    const cursorPos = oldSearchInput ? oldSearchInput.selectionStart : (searchValue ? searchValue.length : 0);
-
     let content = '';
 
     if (currentPage === 'detail') {
@@ -1152,24 +1159,27 @@ const render = () => {
         </div>
     `;
     
+    // Check if search input had focus before render
+    const searchHadFocus = persistentSearchInput && document.activeElement === persistentSearchInput;
+    const cursorPos = persistentSearchInput ? persistentSearchInput.selectionStart : 0;
+
     document.getElementById('app').innerHTML = header + (currentPage === 'home' ? `<main style="margin-top: 70px;">${content}</main>` : content);
 
-    // Restore search input state after render
-    const newSearchInput = document.getElementById('sidebar-search-input');
-    if (newSearchInput && (searchWasFocused || searchValue)) {
-        // Use setTimeout to ensure DOM is fully ready
-        setTimeout(() => {
-            const input = document.getElementById('sidebar-search-input');
-            if (input) {
-                input.value = searchValue;
-                if (searchWasFocused) {
-                    input.focus();
-                    try {
-                        input.setSelectionRange(cursorPos, cursorPos);
-                    } catch (e) {}
-                }
-            }
-        }, 0);
+    // Insert persistent search input into container (if on resources page)
+    const searchContainer = document.getElementById('search-box-container');
+    if (searchContainer) {
+        const input = getOrCreateSearchInput();
+        // Update placeholder based on current tab
+        input.placeholder = currentResourceTab === 'therapy' ? 'Search services...' : 'Search resources...';
+        searchContainer.appendChild(input);
+
+        // Restore focus if it had focus before render
+        if (searchHadFocus) {
+            input.focus();
+            try {
+                input.setSelectionRange(cursorPos, cursorPos);
+            } catch (e) {}
+        }
     }
 };
 
