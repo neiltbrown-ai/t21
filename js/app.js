@@ -375,7 +375,9 @@ const getFilteredResources = () => {
     }
     
     if (filters.subcategory.length) {
-        results = results.filter(r => filters.subcategory.some(f => (r.program_category || '').includes(f)));
+        results = results.filter(r => filters.subcategory.some(f =>
+            (r.subcategories || '').includes(f) || (r.program_category || '').includes(f)
+        ));
     }
     
     if (filters.jurisdiction.length) {
@@ -775,7 +777,7 @@ const renderResourcesResults = () => {
                             <div class="card-org">${r.organization_type || ''}</div>
                             <div class="card-desc">${(r.program_description || '').substring(0, 150)}${(r.program_description || '').length > 150 ? '...' : ''}</div>
                             <div class="card-tags">
-                                <span class="card-tag">${r.program_category || ''}</span>
+                                <span class="card-tag">${(r.subcategories || r.program_category || '').split(';')[0].trim()}</span>
                                 <span class="card-tag">${r.geographic_coverage || ''}</span>
                                 ${r.income_limit === 'None' || !r.income_limit ? '<span class="card-tag highlight">No Income Limits</span>' : ''}
                             </div>
@@ -906,7 +908,7 @@ const renderFinancialDetail = () => {
                 </div>
                 
                 <div class="detail-tags">
-                    <span class="detail-tag">${r.program_category || ''}</span>
+                    <span class="detail-tag">${(r.subcategories || r.program_category || '').split(';')[0].trim()}</span>
                     <span class="detail-tag">${r.geographic_coverage || ''}</span>
                     ${!r.income_limit || r.income_limit === 'None' ? '<span class="detail-tag green">No Income Limits</span>' : ''}
                 </div>
