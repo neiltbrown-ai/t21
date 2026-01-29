@@ -43,6 +43,9 @@ let inspirationFilters = {
 };
 
 // ============== DATA LOADING ==============
+const CACHE_KEY = 't21_data_cache';
+const CACHE_MAX_AGE = 60 * 60 * 1000; // 1 hour in milliseconds
+
 // Map Supabase column names to expected app field names
 const mapFinancialResource = (row) => ({
     ...row,
@@ -60,28 +63,100 @@ const mapFinancialResource = (row) => ({
     'real-world_context': row.practical_notes
 });
 
+// Cache helpers
+function getCache() {
+    try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (!cached) return null;
+        const data = JSON.parse(cached);
+        return data;
+    } catch (e) {
+        return null;
+    }
+}
+
+function setCache(key, data) {
+    try {
+        const cache = getCache() || { timestamp: Date.now() };
+        cache[key] = data;
+        cache.timestamp = Date.now();
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+    } catch (e) {
+        console.warn('Cache write failed:', e);
+    }
+}
+
+function isCacheValid(cache) {
+    if (!cache || !cache.timestamp) return false;
+    return (Date.now() - cache.timestamp) < CACHE_MAX_AGE;
+}
+
+// Lazy load individual data types
+async function loadFinancialData(forceRefresh = false) {
+    if (resourcesData.length > 0 && !forceRefresh) return;
+
+    const cache = getCache();
+    if (!forceRefresh && isCacheValid(cache) && cache.financial) {
+        resourcesData = cache.financial;
+        console.log(`Loaded ${resourcesData.length} financial from cache`);
+        return;
+    }
+
+    const { data, error } = await supabaseClient.from('financial_resources').select('*');
+    if (error) throw error;
+    resourcesData = data.map(mapFinancialResource);
+    setCache('financial', resourcesData);
+    console.log(`Fetched ${resourcesData.length} financial from Supabase`);
+}
+
+async function loadTherapyData(forceRefresh = false) {
+    if (therapyData.length > 0 && !forceRefresh) return;
+
+    const cache = getCache();
+    if (!forceRefresh && isCacheValid(cache) && cache.therapy) {
+        therapyData = cache.therapy;
+        console.log(`Loaded ${therapyData.length} therapy from cache`);
+        return;
+    }
+
+    const { data, error } = await supabaseClient.from('therapy_services').select('*');
+    if (error) throw error;
+    therapyData = data;
+    setCache('therapy', therapyData);
+    console.log(`Fetched ${therapyData.length} therapy from Supabase`);
+}
+
+async function loadInspirationData(forceRefresh = false) {
+    if (inspirationData.length > 0 && !forceRefresh) return;
+
+    const cache = getCache();
+    if (!forceRefresh && isCacheValid(cache) && cache.inspiration) {
+        inspirationData = cache.inspiration;
+        console.log(`Loaded ${inspirationData.length} inspiration from cache`);
+        return;
+    }
+
+    const { data, error } = await supabaseClient.from('inspiration_profiles').select('*');
+    if (error) throw error;
+    inspirationData = data;
+    setCache('inspiration', inspirationData);
+    console.log(`Fetched ${inspirationData.length} inspiration from Supabase`);
+}
+
+// Initial load - only loads financial (default tab)
 async function loadData() {
     try {
-        const [finRes, therRes, inspRes] = await Promise.all([
-            supabaseClient.from('financial_resources').select('*'),
-            supabaseClient.from('therapy_services').select('*'),
-            supabaseClient.from('inspiration_profiles').select('*')
-        ]);
-
-        if (finRes.error) throw finRes.error;
-        if (therRes.error) throw therRes.error;
-        if (inspRes.error) throw inspRes.error;
-
-        // Log first row to debug column names
-        if (finRes.data.length > 0) {
-            console.log('Financial columns:', Object.keys(finRes.data[0]));
-        }
-
-        resourcesData = finRes.data.map(mapFinancialResource);
-        therapyData = therRes.data;
-        inspirationData = inspRes.data;
-        console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
+        await loadFinancialData();
         render();
+
+        // Prefetch other data in background after initial render
+        setTimeout(async () => {
+            try {
+                await Promise.all([loadTherapyData(), loadInspirationData()]);
+            } catch (e) {
+                console.warn('Background prefetch failed:', e);
+            }
+        }, 100);
     } catch (err) {
         console.error('Error loading data:', err);
         document.getElementById('app').innerHTML = '<div style="padding: 2rem; text-align: center;">Error loading data. Please refresh.</div>';
@@ -156,16 +231,32 @@ const getValueBadge = (r) => {
 const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
 
 // ============== NAVIGATION ==============
-window.navigate = function(page, type = null, id = null) {
+window.navigate = async function(page, type = null, id = null) {
     currentPage = page;
     currentDetailType = type;
     currentDetailId = id;
+
+    // Lazy load data if needed
+    if (page === 'inspiration' && inspirationData.length === 0) {
+        await loadInspirationData();
+    } else if (page === 'resources' || page === 'detail') {
+        if (type === 'therapy' && therapyData.length === 0) {
+            await loadTherapyData();
+        }
+    }
+
     render();
     window.scrollTo(0, 0);
 }
 
-window.switchResourceTab = function(tab) {
+window.switchResourceTab = async function(tab) {
     currentResourceTab = tab;
+
+    // Lazy load therapy data if needed
+    if (tab === 'therapy' && therapyData.length === 0) {
+        await loadTherapyData();
+    }
+
     render();
 }
 
