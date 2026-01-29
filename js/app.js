@@ -212,34 +212,17 @@ window.resetInspirationFilters = function() {
 let searchDebounceTimer = null;
 
 window.handleSearch = function(value) {
-    // Clear any pending search
+    // Update searchQuery immediately so it stays in sync
+    searchQuery = value.toLowerCase();
+
+    // Clear any pending search update
     if (searchDebounceTimer) {
         clearTimeout(searchDebounceTimer);
     }
 
-    // Debounce: wait 300ms after user stops typing before updating results
+    // Debounce the render to avoid updating on every keystroke
     searchDebounceTimer = setTimeout(() => {
-        searchQuery = value.toLowerCase();
-        const resultsContainer = document.getElementById('search-results-container');
-        const searchInput = document.getElementById('sidebar-search-input');
-
-        if (resultsContainer && currentPage === 'resources') {
-            // Save cursor position before DOM update
-            const cursorPos = searchInput ? searchInput.selectionStart : 0;
-
-            // Update only the results
-            resultsContainer.innerHTML = renderResourcesResults();
-
-            // Restore focus after browser finishes rendering
-            if (searchInput) {
-                requestAnimationFrame(() => {
-                    searchInput.focus();
-                    searchInput.setSelectionRange(cursorPos, cursorPos);
-                });
-            }
-        } else {
-            render();
-        }
+        render();
     }, 300);
 }
 
@@ -1115,8 +1098,14 @@ const renderAboutPage = () => `
 
 // ============== MAIN RENDER ==============
 const render = () => {
+    // Save search input state before render
+    const oldSearchInput = document.getElementById('sidebar-search-input');
+    const searchWasFocused = oldSearchInput && document.activeElement === oldSearchInput;
+    const searchValue = oldSearchInput ? oldSearchInput.value : '';
+    const cursorPos = oldSearchInput ? oldSearchInput.selectionStart : 0;
+
     let content = '';
-    
+
     if (currentPage === 'detail') {
         if (currentDetailType === 'financial') {
             content = renderFinancialDetail();
@@ -1161,6 +1150,18 @@ const render = () => {
     `;
     
     document.getElementById('app').innerHTML = header + (currentPage === 'home' ? `<main style="margin-top: 70px;">${content}</main>` : content);
+
+    // Restore search input state after render
+    if (searchWasFocused || searchValue) {
+        const newSearchInput = document.getElementById('sidebar-search-input');
+        if (newSearchInput) {
+            newSearchInput.value = searchValue;
+            if (searchWasFocused) {
+                newSearchInput.focus();
+                newSearchInput.setSelectionRange(cursorPos, cursorPos);
+            }
+        }
+    }
 };
 
 // ============== INITIALIZE ==============
