@@ -221,9 +221,22 @@ window.handleSearch = function(value) {
     searchDebounceTimer = setTimeout(() => {
         searchQuery = value.toLowerCase();
         const resultsContainer = document.getElementById('search-results-container');
+        const searchInput = document.getElementById('sidebar-search-input');
 
         if (resultsContainer && currentPage === 'resources') {
+            // Save cursor position before DOM update
+            const cursorPos = searchInput ? searchInput.selectionStart : 0;
+
+            // Update only the results
             resultsContainer.innerHTML = renderResourcesResults();
+
+            // Restore focus after browser finishes rendering
+            if (searchInput) {
+                requestAnimationFrame(() => {
+                    searchInput.focus();
+                    searchInput.setSelectionRange(cursorPos, cursorPos);
+                });
+            }
         } else {
             render();
         }
