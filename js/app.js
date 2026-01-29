@@ -1085,6 +1085,7 @@ const renderAboutPage = () => `
 
 // Persistent search input element (never destroyed)
 let persistentSearchInput = null;
+let searchDebounceTimer = null;
 
 // Create the persistent search input once
 const getOrCreateSearchInput = () => {
@@ -1093,13 +1094,19 @@ const getOrCreateSearchInput = () => {
         persistentSearchInput.type = 'text';
         persistentSearchInput.id = 'sidebar-search-input';
         persistentSearchInput.className = 'search-input';
-        persistentSearchInput.placeholder = 'Search... (press Enter)';
-        // Only update on Enter key - no updates during typing
-        persistentSearchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                searchQuery = e.target.value.toLowerCase();
-                render();
+        persistentSearchInput.placeholder = 'Search...';
+        // Debounced auto-search as user types
+        persistentSearchInput.addEventListener('input', (e) => {
+            if (searchDebounceTimer) {
+                clearTimeout(searchDebounceTimer);
             }
+            searchDebounceTimer = setTimeout(() => {
+                searchQuery = e.target.value.toLowerCase();
+                const resultsContainer = document.getElementById('search-results-container');
+                if (resultsContainer && currentPage === 'resources') {
+                    resultsContainer.innerHTML = renderResourcesResults();
+                }
+            }, 300);
         });
     }
     return persistentSearchInput;
