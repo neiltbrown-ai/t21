@@ -39,6 +39,24 @@ let inspirationFilters = {
 // ============== DATA LOADING ==============
 async function loadData() {
     try {
+        // Try loading from Supabase first (if enabled and available)
+        if (typeof USE_SUPABASE !== 'undefined' && USE_SUPABASE && typeof fetchAllFromSupabase === 'function') {
+            console.log('Loading data from Supabase...');
+            try {
+                const { financial, therapy, inspiration } = await fetchAllFromSupabase();
+                resourcesData = financial;
+                therapyData = therapy;
+                inspirationData = inspiration;
+                console.log(`Loaded from Supabase: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
+                render();
+                return;
+            } catch (supabaseErr) {
+                console.warn('Supabase fetch failed, falling back to local JSON:', supabaseErr.message);
+            }
+        }
+
+        // Fallback to local JSON files
+        console.log('Loading data from local JSON files...');
         const [fin, ther, insp] = await Promise.all([
             fetch('data/financial.json').then(r => r.json()),
             fetch('data/therapy.json').then(r => r.json()),
@@ -47,7 +65,7 @@ async function loadData() {
         resourcesData = fin;
         therapyData = ther;
         inspirationData = insp;
-        console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
+        console.log(`Loaded from JSON: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
         render();
     } catch (err) {
         console.error('Error loading data:', err);
