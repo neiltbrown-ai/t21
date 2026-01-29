@@ -208,6 +208,8 @@ window.resetInspirationFilters = function() {
     render();
 }
 
+// Search is triggered by pressing Enter in the search input
+// No automatic updates during typing to avoid focus issues
 window.handleSearch = function(value) {
     searchQuery = value.toLowerCase();
     render();
@@ -335,12 +337,11 @@ const renderSidebar = (type) => {
                     <span class="sidebar-title">Filters</span>
                     <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
                 </div>
-                
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search services..." 
-                           value="${searchQuery}" onkeyup="handleSearch(this.value)">
+
+                <div class="search-box" id="search-box-container">
+                    <!-- Search input inserted here by JavaScript -->
                 </div>
-                
+
                 <button class="reset-filters-btn ${hasActiveTherapyFilters() ? 'active' : ''}" onclick="resetTherapyFilters()">
                     ${hasActiveTherapyFilters() ? 'Reset Filters' : 'No Filters Applied'}
                 </button>
@@ -417,12 +418,11 @@ const renderSidebar = (type) => {
                     <span class="sidebar-title">Filters</span>
                     <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
                 </div>
-                
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search resources..." 
-                           value="${searchQuery}" onkeyup="handleSearch(this.value)">
+
+                <div class="search-box" id="search-box-container">
+                    <!-- Search input inserted here by JavaScript -->
                 </div>
-                
+
                 <button class="reset-filters-btn ${hasActiveFilters() ? 'active' : ''}" onclick="resetFilters()">
                     ${hasActiveFilters() ? 'Reset Filters' : 'No Filters Applied'}
                 </button>
@@ -581,8 +581,8 @@ const renderHomePage = () => `
     ${renderFooter()}
 `;
 
-// ============== RENDER: RESOURCES PAGE ==============
-const renderResourcesPage = () => {
+// ============== RENDER: RESOURCES RESULTS (for search without losing focus) ==============
+const renderResourcesResults = () => {
     const isTherapy = currentResourceTab === 'therapy';
     const filteredFinancial = getFilteredResources();
     const filteredTherapy = getFilteredTherapy();
@@ -590,7 +590,88 @@ const renderResourcesPage = () => {
     const visibleTherapy = filteredTherapy.slice(0, therapyVisible);
     const hasMoreFinancial = filteredFinancial.length > resourcesVisible;
     const hasMoreTherapy = filteredTherapy.length > therapyVisible;
-    
+
+    if (isTherapy) {
+        return `
+            <div class="results-header">
+                <span class="results-count">Showing ${visibleTherapy.length} of ${filteredTherapy.length} services</span>
+                <div class="sort-controls">
+                    <label>Sort by:</label>
+                    <select><option>Relevance</option><option>Name (A-Z)</option></select>
+                </div>
+            </div>
+
+            ${visibleTherapy.map(r => {
+                const services = (r.subcategories || '').split(';').slice(0, 2).map(s => s.trim());
+                const isTelehealth = (r.telehealth_available || '').toLowerCase().includes('yes');
+                const isFree = (r.cost_type || '').toLowerCase() === 'free';
+                const isExpert = (r.ds_experience_level || '').includes('Expert');
+
+                return `
+                    <div class="card" onclick="navigate('detail', 'therapy', '${r.resource_id}')">
+                        <div class="card-image therapy">Healthcare</div>
+                        <div class="card-body">
+                            <div class="card-title">${r.resource_name || ''}</div>
+                            <div class="card-org">${r.organization_name || ''}</div>
+                            <div class="card-desc">${r.short_description || ''}</div>
+                            <div class="card-tags">
+                                ${services.map(s => `<span class="card-tag therapy">${s}</span>`).join('')}
+                                <span class="card-tag">${r.jurisdiction_level || 'National'}</span>
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            ${isTelehealth ? '<span class="info-badge telehealth">Telehealth</span>' : ''}
+                            ${isFree ? '<span class="info-badge free">Free</span>' : ''}
+                            ${isExpert ? '<span class="info-badge expert">DS Expert</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+
+            ${hasMoreTherapy ? `<button class="load-more-btn" onclick="loadMoreTherapy()">LOAD MORE (${filteredTherapy.length - therapyVisible} remaining)</button>` : ''}
+        `;
+    } else {
+        return `
+            <div class="results-header">
+                <span class="results-count">Showing ${visibleFinancial.length} of ${filteredFinancial.length} resources</span>
+                <div class="sort-controls">
+                    <label>Sort by:</label>
+                    <select><option>Relevance</option><option>Amount (High to Low)</option><option>Name (A-Z)</option></select>
+                </div>
+            </div>
+
+            ${visibleFinancial.map(r => {
+                const badge = getValueBadge(r);
+                return `
+                    <div class="card" onclick="navigate('detail', 'financial', '${r.program_id}')">
+                        <div class="card-image">Financial</div>
+                        <div class="card-body">
+                            <div class="card-title">${r.program_name || ''}</div>
+                            <div class="card-org">${r.organization_type || ''}</div>
+                            <div class="card-desc">${(r.program_description || '').substring(0, 150)}${(r.program_description || '').length > 150 ? '...' : ''}</div>
+                            <div class="card-tags">
+                                <span class="card-tag">${r.program_category || ''}</span>
+                                <span class="card-tag">${r.geographic_coverage || ''}</span>
+                                ${r.income_limit === 'None' || !r.income_limit ? '<span class="card-tag highlight">No Income Limits</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="card-amount">
+                            <span class="card-amount-label">${badge.label}</span>
+                            <span class="card-amount-value">${badge.value}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+
+            ${hasMoreFinancial ? `<button class="load-more-btn" onclick="loadMoreResources()">LOAD MORE (${filteredFinancial.length - resourcesVisible} remaining)</button>` : ''}
+        `;
+    }
+};
+
+// ============== RENDER: RESOURCES PAGE ==============
+const renderResourcesPage = () => {
+    const isTherapy = currentResourceTab === 'therapy';
+
     return `
         <div class="main-wrapper">
             ${renderSidebar(isTherapy ? 'therapy' : 'resources')}
@@ -599,7 +680,7 @@ const renderResourcesPage = () => {
                     <h1 class="page-title">Resources Directory</h1>
                     <p class="page-subtitle">Comprehensive support resources for the Down syndrome community.</p>
                 </div>
-                
+
                 <div class="sub-tabs">
                     <button class="sub-tab ${currentResourceTab === 'financial' ? 'active' : ''}" onclick="switchResourceTab('financial')">
                         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -612,78 +693,10 @@ const renderResourcesPage = () => {
                         <span class="tab-count">${therapyData.length}</span>
                     </button>
                 </div>
-                
-                ${isTherapy ? `
-                    <div class="results-header">
-                        <span class="results-count">Showing ${visibleTherapy.length} of ${filteredTherapy.length} services</span>
-                        <div class="sort-controls">
-                            <label>Sort by:</label>
-                            <select><option>Relevance</option><option>Name (A-Z)</option></select>
-                        </div>
-                    </div>
-                    
-                    ${visibleTherapy.map(r => {
-                        const services = (r.subcategories || '').split(';').slice(0, 2).map(s => s.trim());
-                        const isTelehealth = (r.telehealth_available || '').toLowerCase().includes('yes');
-                        const isFree = (r.cost_type || '').toLowerCase() === 'free';
-                        const isExpert = (r.ds_experience_level || '').includes('Expert');
-                        
-                        return `
-                            <div class="card" onclick="navigate('detail', 'therapy', '${r.resource_id}')">
-                                <div class="card-image therapy">Healthcare</div>
-                                <div class="card-body">
-                                    <div class="card-title">${r.resource_name || ''}</div>
-                                    <div class="card-org">${r.organization_name || ''}</div>
-                                    <div class="card-desc">${r.short_description || ''}</div>
-                                    <div class="card-tags">
-                                        ${services.map(s => `<span class="card-tag therapy">${s}</span>`).join('')}
-                                        <span class="card-tag">${r.jurisdiction_level || 'National'}</span>
-                                    </div>
-                                </div>
-                                <div class="card-badges">
-                                    ${isTelehealth ? '<span class="info-badge telehealth">Telehealth</span>' : ''}
-                                    ${isFree ? '<span class="info-badge free">Free</span>' : ''}
-                                    ${isExpert ? '<span class="info-badge expert">DS Expert</span>' : ''}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                    
-                    ${hasMoreTherapy ? `<button class="load-more-btn" onclick="loadMoreTherapy()">LOAD MORE (${filteredTherapy.length - therapyVisible} remaining)</button>` : ''}
-                ` : `
-                    <div class="results-header">
-                        <span class="results-count">Showing ${visibleFinancial.length} of ${filteredFinancial.length} resources</span>
-                        <div class="sort-controls">
-                            <label>Sort by:</label>
-                            <select><option>Relevance</option><option>Amount (High to Low)</option><option>Name (A-Z)</option></select>
-                        </div>
-                    </div>
-                    
-                    ${visibleFinancial.map(r => {
-                        const badge = getValueBadge(r);
-                        return `
-                            <div class="card" onclick="navigate('detail', 'financial', '${r.program_id}')">
-                                <div class="card-image">Financial</div>
-                                <div class="card-body">
-                                    <div class="card-title">${r.program_name || ''}</div>
-                                    <div class="card-org">${r.organization_type || ''}</div>
-                                    <div class="card-desc">${(r.program_description || '').substring(0, 150)}${(r.program_description || '').length > 150 ? '...' : ''}</div>
-                                    <div class="card-tags">
-                                        <span class="card-tag">${r.program_category || ''}</span>
-                                        <span class="card-tag">${r.geographic_coverage || ''}</span>
-                                        ${r.income_limit === 'None' || !r.income_limit ? '<span class="card-tag highlight">No Income Limits</span>' : ''}
-                                    </div>
-                                </div>
-                                <div class="card-amount">
-                                    <span class="card-amount-label">${badge.label}</span>
-                                    <span class="card-amount-value">${badge.value}</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                    
-                    ${hasMoreFinancial ? `<button class="load-more-btn" onclick="loadMoreResources()">LOAD MORE (${filteredFinancial.length - resourcesVisible} remaining)</button>` : ''}
-                `}
+
+                <div id="search-results-container">
+                    ${renderResourcesResults()}
+                </div>
             </div>
         </div>
     `;
@@ -1070,10 +1083,44 @@ const renderAboutPage = () => `
     </div>
 `;
 
+// Persistent search input element (never destroyed)
+let persistentSearchInput = null;
+let searchDebounceTimer = null;
+
+// Create the persistent search input once
+const getOrCreateSearchInput = () => {
+    if (!persistentSearchInput) {
+        persistentSearchInput = document.createElement('input');
+        persistentSearchInput.type = 'text';
+        persistentSearchInput.id = 'sidebar-search-input';
+        persistentSearchInput.className = 'search-input';
+        persistentSearchInput.placeholder = 'Search...';
+        // Debounced auto-search as user types
+        persistentSearchInput.addEventListener('input', (e) => {
+            if (searchDebounceTimer) {
+                clearTimeout(searchDebounceTimer);
+            }
+            const input = e.target;
+            searchDebounceTimer = setTimeout(() => {
+                const cursorPos = input.selectionStart;
+                searchQuery = input.value.toLowerCase();
+                const resultsContainer = document.getElementById('search-results-container');
+                if (resultsContainer && currentPage === 'resources') {
+                    resultsContainer.innerHTML = renderResourcesResults();
+                    // Restore focus after DOM update
+                    input.focus();
+                    input.setSelectionRange(cursorPos, cursorPos);
+                }
+            }, 300);
+        });
+    }
+    return persistentSearchInput;
+};
+
 // ============== MAIN RENDER ==============
 const render = () => {
     let content = '';
-    
+
     if (currentPage === 'detail') {
         if (currentDetailType === 'financial') {
             content = renderFinancialDetail();
@@ -1117,7 +1164,28 @@ const render = () => {
         </div>
     `;
     
+    // Check if search input had focus before render
+    const searchHadFocus = persistentSearchInput && document.activeElement === persistentSearchInput;
+    const cursorPos = persistentSearchInput ? persistentSearchInput.selectionStart : 0;
+
     document.getElementById('app').innerHTML = header + (currentPage === 'home' ? `<main style="margin-top: 70px;">${content}</main>` : content);
+
+    // Insert persistent search input into container (if on resources page)
+    const searchContainer = document.getElementById('search-box-container');
+    if (searchContainer) {
+        const input = getOrCreateSearchInput();
+        // Update placeholder based on current tab
+        input.placeholder = currentResourceTab === 'therapy' ? 'Search services...' : 'Search resources...';
+        searchContainer.appendChild(input);
+
+        // Restore focus if it had focus before render
+        if (searchHadFocus) {
+            input.focus();
+            try {
+                input.setSelectionRange(cursorPos, cursorPos);
+            } catch (e) {}
+        }
+    }
 };
 
 // ============== INITIALIZE ==============
