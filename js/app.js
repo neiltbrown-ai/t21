@@ -107,6 +107,9 @@ async function loadFinancialData(forceRefresh = false) {
     resourcesData = data.map(mapFinancialResource);
     setCache('financial', resourcesData);
     console.log(`Fetched ${resourcesData.length} financial from Supabase`);
+    // Debug: log unique category values
+    const categories = [...new Set(resourcesData.map(r => r.program_category))];
+    console.log('Financial categories:', categories);
 }
 
 async function loadTherapyData(forceRefresh = false) {
@@ -733,7 +736,6 @@ const renderResourcesResults = () => {
 
                 return `
                     <div class="card" onclick="navigate('detail', 'therapy', '${r.resource_id}')">
-                        <div class="card-image therapy">Healthcare</div>
                         <div class="card-body">
                             <div class="card-title">${r.resource_name || ''}</div>
                             <div class="card-org">${r.organization_name || ''}</div>
@@ -768,7 +770,6 @@ const renderResourcesResults = () => {
                 const badge = getValueBadge(r);
                 return `
                     <div class="card" onclick="navigate('detail', 'financial', '${r.program_id}')">
-                        <div class="card-image">Financial</div>
                         <div class="card-body">
                             <div class="card-title">${r.program_name || ''}</div>
                             <div class="card-org">${r.organization_type || ''}</div>
@@ -895,10 +896,6 @@ const renderFinancialDetail = () => {
                 </div>
             </div>
             <div class="detail-content">
-                <div class="detail-image-banner">
-                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.program_name}">` : ''}
-                </div>
-                
                 <h1 class="detail-title">${r.program_name}</h1>
                 <p class="detail-org">${r.organization_type || ''}</p>
                 
@@ -995,10 +992,6 @@ const renderTherapyDetail = () => {
                 </div>
             </div>
             <div class="detail-content">
-                <div class="detail-image-banner" style="background: linear-gradient(135deg, #8B5CF6 0%, #c4b5fd 100%);">
-                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.resource_name}">` : ''}
-                </div>
-                
                 <h1 class="detail-title">${r.resource_name}</h1>
                 <p class="detail-org">${r.organization_name || ''} &#8226; ${r.organization_type || ''}</p>
                 
