@@ -1100,11 +1100,16 @@ const getOrCreateSearchInput = () => {
             if (searchDebounceTimer) {
                 clearTimeout(searchDebounceTimer);
             }
+            const input = e.target;
             searchDebounceTimer = setTimeout(() => {
-                searchQuery = e.target.value.toLowerCase();
+                const cursorPos = input.selectionStart;
+                searchQuery = input.value.toLowerCase();
                 const resultsContainer = document.getElementById('search-results-container');
                 if (resultsContainer && currentPage === 'resources') {
                     resultsContainer.innerHTML = renderResourcesResults();
+                    // Restore focus after DOM update
+                    input.focus();
+                    input.setSelectionRange(cursorPos, cursorPos);
                 }
             }, 300);
         });
