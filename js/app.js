@@ -43,6 +43,17 @@ let inspirationFilters = {
 };
 
 // ============== DATA LOADING ==============
+// Map Supabase column names to expected app field names
+const mapFinancialResource = (row) => ({
+    ...row,
+    program_id: row.program_id || row.id,
+    program_name: row.program_name || row.name,
+    program_category: row.program_category || row.category,
+    program_description: row.program_description || row.description,
+    'key_features_&_benefits': row['key_features_&_benefits'] || row.key_features_benefits || row.key_features,
+    'real-world_context': row['real-world_context'] || row.real_world_context
+});
+
 async function loadData() {
     try {
         const [finRes, therRes, inspRes] = await Promise.all([
@@ -55,7 +66,12 @@ async function loadData() {
         if (therRes.error) throw therRes.error;
         if (inspRes.error) throw inspRes.error;
 
-        resourcesData = finRes.data;
+        // Log first row to debug column names
+        if (finRes.data.length > 0) {
+            console.log('Financial columns:', Object.keys(finRes.data[0]));
+        }
+
+        resourcesData = finRes.data.map(mapFinancialResource);
         therapyData = therRes.data;
         inspirationData = inspRes.data;
         console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
