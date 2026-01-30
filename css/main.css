@@ -403,12 +403,13 @@
         }
 
         .card-image {
+            /* Hidden until images are sourced */
+            display: none;
             width: 140px;
             height: 95px;
             background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
             border-radius: 4px;
             flex-shrink: 0;
-            display: flex;
             align-items: center;
             justify-content: center;
             color: rgba(255,255,255,0.7);
@@ -661,11 +662,12 @@
 
         /* Resource Detail - Image Banner */
         .detail-image-banner {
+            /* Hidden until images are sourced */
+            display: none;
             width: 100%;
             aspect-ratio: 16/9;
             background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
             border-radius: 8px;
-            display: flex;
             align-items: center;
             justify-content: center;
             color: rgba(255,255,255,0.5);
@@ -1481,10 +1483,16 @@
             }
             .content {
                 padding-left: 75px;
-                padding-right: 1rem;
+                padding-right: 15px;
             }
             .card {
                 flex-direction: column;
+                width: 100%;
+                max-width: 100%;
+                overflow: hidden;
+            }
+            .card-body {
+                width: 100%;
             }
             .card-image {
                 width: 100%;
@@ -1689,5 +1697,217 @@
 @media (min-width: 1024px) {
     .home-cards.three-col {
         grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ================================================
+   RESPITE & CAREGIVING SECTION ADDITIONS
+   ================================================ */
+
+/* Respite card variant - warm orange/coral */
+.card-image.respite {
+    background: linear-gradient(135deg, #f97316 0%, #fdba74 100%);
+}
+
+.card-tag.respite {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.detail-tag.respite {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.detail-tag.overnight {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.detail-tag.emergency {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Respite info badges */
+.info-badge.overnight {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.info-badge.emergency {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.info-badge.virtual {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.info-badge.sibling {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+/* Orange home card for respite */
+.home-card.orange {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+    border: 1px solid #fdba74;
+}
+
+.home-card.orange::before {
+    background: #fb923c;
+}
+
+.home-card.orange .home-card-tag {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.home-card.orange .home-card-link {
+    color: #ea580c;
+}
+
+/* Home cards layout: 2 per row (scales for future categories) */
+.home-cards.four-col {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 768px) {
+    .home-cards.four-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile: Stack sub-tabs (Resource Categories) */
+@media (max-width: 768px) {
+    .sub-tabs {
+        flex-direction: column;
+        border-bottom: none;
+        gap: 0.5rem;
+        background: var(--color-gray-light);
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+
+    .sub-tab {
+        justify-content: flex-start;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        background: var(--color-white);
+        border: 1px solid var(--color-gray-border);
+    }
+
+    .sub-tab.active {
+        background: var(--color-primary);
+        color: var(--color-white);
+        border-color: var(--color-primary);
+    }
+
+    .sub-tab.active::after {
+        display: none;
+    }
+
+    .sub-tab.active .tab-count {
+        background: rgba(255,255,255,0.2);
+        color: var(--color-white);
+    }
+}
+
+/* Respite sub-tab active state */
+.sub-tab.active.respite-tab .tab-count,
+.sub-tab:nth-child(3).active .tab-count {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+/* ================================================
+   PAGE LOADER
+   ================================================ */
+
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-logo {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.loader-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.loader-dots span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    animation: bounce 1.4s ease-in-out infinite;
+}
+
+.loader-dots span:nth-child(1) {
+    animation-delay: 0s;
+    background: var(--color-primary);
+}
+
+.loader-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+    background: #8b5cf6;
+}
+
+.loader-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+    background: var(--color-secondary);
+}
+
+.loader-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    color: var(--color-gray-text);
+    letter-spacing: 0.5px;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
     }
 }
