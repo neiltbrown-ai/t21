@@ -1691,3 +1691,98 @@
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* ================================================
+   RESPITE & CAREGIVING SECTION ADDITIONS
+   ================================================ */
+
+/* Respite card variant - warm orange/coral */
+.card-image.respite {
+    background: linear-gradient(135deg, #f97316 0%, #fdba74 100%);
+}
+
+.card-tag.respite {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.detail-tag.respite {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.detail-tag.overnight {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.detail-tag.emergency {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Respite info badges */
+.info-badge.overnight {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.info-badge.emergency {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.info-badge.virtual {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.info-badge.sibling {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+/* Orange home card for respite */
+.home-card.orange {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+    border: 1px solid #fdba74;
+}
+
+.home-card.orange::before {
+    background: #fb923c;
+}
+
+.home-card.orange .home-card-tag {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.home-card.orange .home-card-link {
+    color: #ea580c;
+}
+
+/* Adjust home cards to 4 columns for full layout */
+@media (min-width: 1200px) {
+    .home-cards.four-col {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+    .home-cards.four-col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1023px) {
+    .home-cards.four-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Respite sub-tab active state */
+.sub-tab.active.respite-tab .tab-count,
+.sub-tab:nth-child(3).active .tab-count {
+    background: #ffedd5;
+    color: #c2410c;
+}

@@ -1,10 +1,43 @@
 // T21 Directory - Main Application
 // Restored to match original layout with therapy additions
 
+// ============== SUPABASE CLIENT ==============
+const SUPABASE_URL = 'https://qistidaxuevycutiegsa.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpc3RpZGF4dWV2eWN1dGllZ3NhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3MTM5NTAsImV4cCI6MjA4NTI4OTk1MH0.6U6g4gsabRGxvcPAaO1so5cZgS38GqGhKfHmq6E9dSA';
+
+// Simple Supabase client for fetching data
+const supabaseClient = {
+    from: (table) => ({
+        select: async (columns = '*') => {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${table}?select=${columns}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return { data, error: null };
+            } catch (error) {
+                console.error(`Error fetching from ${table}:`, error);
+                return { data: null, error };
+            }
+        }
+    })
+};
+
 // ============== DATA ==============
 let resourcesData = [];
 let therapyData = [];
 let inspirationData = [];
+let respiteData = [];
 
 // ============== STATE ==============
 let currentPage = 'home';
@@ -15,6 +48,7 @@ let sidebarCollapsed = true;
 let resourcesVisible = 10;
 let therapyVisible = 10;
 let inspirationVisible = 12;
+let respiteVisible = 10;
 let searchQuery = '';
 
 let filters = {
@@ -36,9 +70,16 @@ let inspirationFilters = {
     country: []
 };
 
+let respiteFilters = {
+    respiteType: [],
+    overnightAvailable: [],
+    jurisdiction: []
+};
+
 // ============== DATA LOADING ==============
 async function loadData() {
     try {
+        // Load JSON files for financial, therapy, and inspiration
         const [fin, ther, insp] = await Promise.all([
             fetch('data/financial.json').then(r => r.json()),
             fetch('data/therapy.json').then(r => r.json()),
@@ -47,7 +88,17 @@ async function loadData() {
         resourcesData = fin;
         therapyData = ther;
         inspirationData = insp;
-        console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration`);
+
+        // Load respite data from Supabase
+        const { data: respite, error: respiteError } = await supabaseClient.from('respite_caregiving').select('*');
+        if (respiteError) {
+            console.error('Error loading respite data:', respiteError);
+            respiteData = [];
+        } else {
+            respiteData = respite || [];
+        }
+
+        console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration, ${respiteData.length} respite`);
         render();
     } catch (err) {
         console.error('Error loading data:', err);
@@ -193,6 +244,16 @@ window.toggleInspirationFilter = function(category, value) {
     render();
 }
 
+window.toggleRespiteFilter = function(category, value) {
+    const idx = respiteFilters[category].indexOf(value);
+    if (idx > -1) {
+        respiteFilters[category].splice(idx, 1);
+    } else {
+        respiteFilters[category].push(value);
+    }
+    render();
+}
+
 window.resetFilters = function() {
     filters = { subcategory: [], lifecycle: [], jurisdiction: [], income: [], age: [] };
     render();
@@ -208,6 +269,11 @@ window.resetInspirationFilters = function() {
     render();
 }
 
+window.resetRespiteFilters = function() {
+    respiteFilters = { respiteType: [], overnightAvailable: [], jurisdiction: [] };
+    render();
+}
+
 // Search is triggered by pressing Enter in the search input
 // No automatic updates during typing to avoid focus issues
 window.handleSearch = function(value) {
@@ -218,6 +284,7 @@ window.handleSearch = function(value) {
 const hasActiveFilters = () => Object.values(filters).some(arr => arr.length > 0);
 const hasActiveTherapyFilters = () => Object.values(therapyFilters).some(arr => arr.length > 0);
 const hasActiveInspirationFilters = () => Object.values(inspirationFilters).some(arr => arr.length > 0);
+const hasActiveRespiteFilters = () => Object.values(respiteFilters).some(arr => arr.length > 0);
 
 // ============== LOAD MORE ==============
 window.loadMoreResources = function() {
@@ -232,6 +299,11 @@ window.loadMoreTherapy = function() {
 
 window.loadMoreInspiration = function() {
     inspirationVisible += 12;
+    render();
+}
+
+window.loadMoreRespite = function() {
+    respiteVisible += 10;
     render();
 }
 
@@ -309,14 +381,14 @@ const getFilteredTherapy = () => {
 
 const getFilteredInspiration = () => {
     let results = [...inspirationData];
-    
+
     if (inspirationFilters.field.length) {
         results = results.filter(p => {
             const normalizedField = normalizeField(p.primary_field);
             return inspirationFilters.field.includes(normalizedField);
         });
     }
-    
+
     if (inspirationFilters.country.length) {
         results = results.filter(p => {
             const country = (p.location_country || 'USA');
@@ -324,7 +396,39 @@ const getFilteredInspiration = () => {
             return inspirationFilters.country.includes(normalized);
         });
     }
-    
+
+    return results;
+};
+
+const getFilteredRespite = () => {
+    let results = [...respiteData];
+
+    if (searchQuery) {
+        results = results.filter(r =>
+            (r.resource_name || '').toLowerCase().includes(searchQuery) ||
+            (r.short_description || '').toLowerCase().includes(searchQuery) ||
+            (r.respite_type || '').toLowerCase().includes(searchQuery) ||
+            (r.organization_name || '').toLowerCase().includes(searchQuery)
+        );
+    }
+
+    if (respiteFilters.respiteType.length) {
+        results = results.filter(r =>
+            respiteFilters.respiteType.some(t => (r.respite_type || '').includes(t))
+        );
+    }
+
+    if (respiteFilters.overnightAvailable.length && respiteFilters.overnightAvailable.includes('Yes')) {
+        results = results.filter(r => {
+            const overnight = (r.overnight_available || '').toLowerCase();
+            return overnight === 'yes' || overnight === 'true' || overnight.includes('yes');
+        });
+    }
+
+    if (respiteFilters.jurisdiction.length) {
+        results = results.filter(r => respiteFilters.jurisdiction.includes(r.jurisdiction_level));
+    }
+
     return results;
 };
 
@@ -407,6 +511,52 @@ const renderSidebar = (type) => {
                     </button>
                     <label class="filter"><input type="checkbox" ${inspirationFilters.country.includes('Australia') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'Australia')"> Australia</label>
                     <label class="filter"><input type="checkbox" ${inspirationFilters.country.includes('United States') ? 'checked' : ''} onchange="toggleInspirationFilter('country', 'United States')"> United States</label>
+                </div>
+            </div>
+        `;
+    } else if (type === 'respite') {
+        return `
+            <div class="sidebar ${sidebarCollapsed ? 'collapsed' : ''}">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Filters</span>
+                    <button class="sidebar-toggle-btn" onclick="toggleSidebar()">&#8249;</button>
+                </div>
+
+                <div class="search-box" id="search-box-container">
+                    <!-- Search input inserted here by JavaScript -->
+                </div>
+
+                <button class="reset-filters-btn ${hasActiveRespiteFilters() ? 'active' : ''}" onclick="resetRespiteFilters()">
+                    ${hasActiveRespiteFilters() ? 'Reset Filters' : 'No Filters Applied'}
+                </button>
+
+                <div class="facet">
+                    <div class="facet-title">Respite Type</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Respite Type">
+                        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.respiteType.includes('In-Home') ? 'checked' : ''} onchange="toggleRespiteFilter('respiteType', 'In-Home')"> In-Home Respite</label>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.respiteType.includes('Center-Based') ? 'checked' : ''} onchange="toggleRespiteFilter('respiteType', 'Center-Based')"> Center-Based</label>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.respiteType.includes('Camp') ? 'checked' : ''} onchange="toggleRespiteFilter('respiteType', 'Camp')"> Camp Programs</label>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.respiteType.includes('Emergency') ? 'checked' : ''} onchange="toggleRespiteFilter('respiteType', 'Emergency')"> Emergency Respite</label>
+                </div>
+
+                <div class="facet">
+                    <div class="facet-title">Overnight Care</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Overnight">
+                        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.overnightAvailable.includes('Yes') ? 'checked' : ''} onchange="toggleRespiteFilter('overnightAvailable', 'Yes')"> Available</label>
+                </div>
+
+                <div class="facet">
+                    <div class="facet-title">Coverage</div>
+                    <button class="facet-icon" onclick="expandSidebar()" title="Coverage">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                    </button>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.jurisdiction.includes('National') ? 'checked' : ''} onchange="toggleRespiteFilter('jurisdiction', 'National')"> National</label>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.jurisdiction.includes('Regional') ? 'checked' : ''} onchange="toggleRespiteFilter('jurisdiction', 'Regional')"> Regional</label>
+                    <label class="filter"><input type="checkbox" ${respiteFilters.jurisdiction.includes('State') ? 'checked' : ''} onchange="toggleRespiteFilter('jurisdiction', 'State')"> State</label>
                 </div>
             </div>
         `;
@@ -510,18 +660,18 @@ const renderHomePage = () => `
             <div class="stat-label">Healthcare Services</div>
         </div>
         <div class="stat-card">
+            <div class="stat-icon" style="background: #f97316;">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </div>
+            <div class="stat-value">${respiteData.length}</div>
+            <div class="stat-label">Respite Services</div>
+        </div>
+        <div class="stat-card">
             <div class="stat-icon" style="background: var(--color-secondary);">
                 <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
             <div class="stat-value">${inspirationData.length}</div>
             <div class="stat-label">Inspiring Individuals</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background: var(--color-tertiary);">
-                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            </div>
-            <div class="stat-value">50</div>
-            <div class="stat-label">States Covered</div>
         </div>
     </div>
     
@@ -530,7 +680,7 @@ const renderHomePage = () => `
             <h2>Explore the Directory</h2>
             <p>Find the support you need, from financial assistance to healthcare to inspiring role models.</p>
         </div>
-        <div class="home-cards three-col">
+        <div class="home-cards four-col">
             <a href="#" class="home-card blue" onclick="navigate('resources'); return false;">
                 <div class="home-card-content">
                     <div class="home-card-icon" style="background: var(--color-primary);">
@@ -561,6 +711,21 @@ const renderHomePage = () => `
                     <span class="home-card-link">Find Services &#8594;</span>
                 </div>
             </a>
+            <a href="#" class="home-card orange" onclick="switchResourceTab('respite'); navigate('resources'); return false;">
+                <div class="home-card-content">
+                    <div class="home-card-icon" style="background: #f97316;">
+                        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </div>
+                    <h3>Respite &amp; Caregiving</h3>
+                    <p>Find ${respiteData.length}+ respite care providers, support groups, and caregiver resources.</p>
+                    <div class="home-card-tags">
+                        <span class="home-card-tag">In-Home Care</span>
+                        <span class="home-card-tag">Overnight</span>
+                        <span class="home-card-tag">Camps</span>
+                    </div>
+                    <span class="home-card-link">Find Respite Care &#8594;</span>
+                </div>
+            </a>
             <a href="#" class="home-card teal" onclick="navigate('inspiration'); return false;">
                 <div class="home-card-content">
                     <div class="home-card-icon" style="background: var(--color-secondary);">
@@ -584,14 +749,60 @@ const renderHomePage = () => `
 // ============== RENDER: RESOURCES RESULTS (for search without losing focus) ==============
 const renderResourcesResults = () => {
     const isTherapy = currentResourceTab === 'therapy';
+    const isRespite = currentResourceTab === 'respite';
     const filteredFinancial = getFilteredResources();
     const filteredTherapy = getFilteredTherapy();
+    const filteredRespite = getFilteredRespite();
     const visibleFinancial = filteredFinancial.slice(0, resourcesVisible);
     const visibleTherapy = filteredTherapy.slice(0, therapyVisible);
+    const visibleRespite = filteredRespite.slice(0, respiteVisible);
     const hasMoreFinancial = filteredFinancial.length > resourcesVisible;
     const hasMoreTherapy = filteredTherapy.length > therapyVisible;
+    const hasMoreRespite = filteredRespite.length > respiteVisible;
 
-    if (isTherapy) {
+    if (isRespite) {
+        return `
+            <div class="results-header">
+                <span class="results-count">Showing ${visibleRespite.length} of ${filteredRespite.length} respite services</span>
+                <div class="sort-controls">
+                    <label>Sort by:</label>
+                    <select><option>Relevance</option><option>Name (A-Z)</option></select>
+                </div>
+            </div>
+
+            ${visibleRespite.map(r => {
+                const respiteType = r.respite_type || 'Respite Care';
+                const isOvernight = (r.overnight_available || '').toLowerCase() === 'yes' || (r.overnight_available || '').toLowerCase() === 'true';
+                const isEmergency = (r.emergency_respite || '').toLowerCase() === 'yes' || (r.emergency_respite || '').toLowerCase() === 'true';
+                const hasVirtual = (r.virtual_options || '').toLowerCase() === 'yes' || (r.virtual_options || '').toLowerCase() === 'true';
+                const hasSiblingPrograms = (r.sibling_programs || '').toLowerCase() === 'yes' || (r.sibling_programs || '').toLowerCase() === 'true';
+
+                return `
+                    <div class="card" onclick="navigate('detail', 'respite', '${r.id || r.resource_id}')">
+                        <div class="card-image respite">Respite</div>
+                        <div class="card-body">
+                            <div class="card-title">${r.resource_name || ''}</div>
+                            <div class="card-org">${r.organization_name || ''}</div>
+                            <div class="card-desc">${r.short_description || ''}</div>
+                            <div class="card-tags">
+                                <span class="card-tag respite">${respiteType}</span>
+                                <span class="card-tag">${r.jurisdiction_level || 'National'}</span>
+                                ${r.hours_available ? `<span class="card-tag">${r.hours_available}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="card-badges">
+                            ${isOvernight ? '<span class="info-badge overnight">Overnight</span>' : ''}
+                            ${isEmergency ? '<span class="info-badge emergency">Emergency</span>' : ''}
+                            ${hasVirtual ? '<span class="info-badge virtual">Virtual</span>' : ''}
+                            ${hasSiblingPrograms ? '<span class="info-badge sibling">Sibling Programs</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+
+            ${hasMoreRespite ? `<button class="load-more-btn" onclick="loadMoreRespite()">LOAD MORE (${filteredRespite.length - respiteVisible} remaining)</button>` : ''}
+        `;
+    } else if (isTherapy) {
         return `
             <div class="results-header">
                 <span class="results-count">Showing ${visibleTherapy.length} of ${filteredTherapy.length} services</span>
@@ -671,10 +882,14 @@ const renderResourcesResults = () => {
 // ============== RENDER: RESOURCES PAGE ==============
 const renderResourcesPage = () => {
     const isTherapy = currentResourceTab === 'therapy';
+    const isRespite = currentResourceTab === 'respite';
+    let sidebarType = 'resources';
+    if (isTherapy) sidebarType = 'therapy';
+    else if (isRespite) sidebarType = 'respite';
 
     return `
         <div class="main-wrapper">
-            ${renderSidebar(isTherapy ? 'therapy' : 'resources')}
+            ${renderSidebar(sidebarType)}
             <div class="content">
                 <div class="page-header">
                     <h1 class="page-title">Resources Directory</h1>
@@ -691,6 +906,11 @@ const renderResourcesPage = () => {
                         <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                         Healthcare &amp; Therapy
                         <span class="tab-count">${therapyData.length}</span>
+                    </button>
+                    <button class="sub-tab ${currentResourceTab === 'respite' ? 'active' : ''}" onclick="switchResourceTab('respite')">
+                        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        Respite &amp; Caregiving
+                        <span class="tab-count">${respiteData.length}</span>
                     </button>
                 </div>
 
@@ -945,6 +1165,154 @@ const renderTherapyDetail = () => {
     `;
 };
 
+const renderRespiteDetail = () => {
+    const r = respiteData.find(res => (res.id || res.resource_id) === currentDetailId);
+    if (!r) return '<div class="detail-page"><div class="detail-content">Resource not found</div></div>';
+
+    const isOvernight = (r.overnight_available || '').toLowerCase() === 'yes' || (r.overnight_available || '').toLowerCase() === 'true';
+    const isEmergency = (r.emergency_respite || '').toLowerCase() === 'yes' || (r.emergency_respite || '').toLowerCase() === 'true';
+    const hasVirtual = (r.virtual_options || '').toLowerCase() === 'yes' || (r.virtual_options || '').toLowerCase() === 'true';
+    const hasSiblingPrograms = (r.sibling_programs || '').toLowerCase() === 'yes' || (r.sibling_programs || '').toLowerCase() === 'true';
+    const hasTransportation = (r.transportation_provided || '').toLowerCase() === 'yes' || (r.transportation_provided || '').toLowerCase() === 'true';
+    const backgroundCheckRequired = (r.background_check_required || '').toLowerCase() === 'yes' || (r.background_check_required || '').toLowerCase() === 'true';
+    const providerTrainingRequired = (r.provider_training_required || '').toLowerCase() === 'yes' || (r.provider_training_required || '').toLowerCase() === 'true';
+
+    return `
+        <div class="detail-page">
+            <div class="detail-back-bar">
+                <div class="detail-back-bar-content">
+                    <a href="#" class="back-link" onclick="switchResourceTab('respite'); navigate('resources'); return false;">&#8592; Back to Respite &amp; Caregiving</a>
+                </div>
+            </div>
+            <div class="detail-content">
+                <div class="detail-image-banner" style="background: linear-gradient(135deg, #f97316 0%, #fdba74 100%);">
+                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.resource_name}">` : ''}
+                </div>
+
+                <h1 class="detail-title">${r.resource_name}</h1>
+                <p class="detail-org">${r.organization_name || ''}</p>
+
+                <div class="detail-tags">
+                    <span class="detail-tag respite">${r.respite_type || 'Respite Care'}</span>
+                    <span class="detail-tag">${r.jurisdiction_level || 'National'}</span>
+                    ${isOvernight ? '<span class="detail-tag overnight">Overnight Available</span>' : ''}
+                    ${isEmergency ? '<span class="detail-tag emergency">Emergency Respite</span>' : ''}
+                </div>
+
+                <div class="detail-description">
+                    <p>${r.short_description || ''}</p>
+                    ${(r.full_description || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                </div>
+
+                <div class="detail-actions">
+                    ${r.website ? `<a href="${r.website.startsWith('http') ? r.website : 'https://' + r.website}" target="_blank" class="btn btn-primary">Visit Website &#8594;</a>` : ''}
+                    ${r.phone ? `<a href="tel:${r.phone.replace(/[^0-9]/g, '')}" class="btn btn-secondary">&#128222; ${r.phone}</a>` : ''}
+                </div>
+
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Service Details</h2>
+                    <div class="detail-grid">
+                        <div class="detail-grid-item">
+                            <label>Respite Type</label>
+                            <span>${r.respite_type || 'Contact for info'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Hours Available</label>
+                            <span>${r.hours_available || 'Contact for info'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Overnight Care</label>
+                            <span>${isOvernight ? 'Yes' : 'No'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Emergency Respite</label>
+                            <span>${isEmergency ? 'Yes' : 'No'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Cost</label>
+                            <span>${r.cost_type || 'Contact for info'}${r.cost_details ? ` - ${r.cost_details}` : ''}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Coverage Area</label>
+                            <span>${r.jurisdiction_level || 'Contact for info'}${r.states_available ? ` (${r.states_available})` : ''}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Care Requirements</h2>
+                    <div class="detail-grid">
+                        <div class="detail-grid-item">
+                            <label>Provider Training Required</label>
+                            <span>${providerTrainingRequired ? 'Yes' : 'Not specified'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Background Check Required</label>
+                            <span>${backgroundCheckRequired ? 'Yes' : 'Not specified'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Medical Care Capability</label>
+                            <span>${r.medical_care_capability || 'Contact for info'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Advance Notice Required</label>
+                            <span>${r.advance_notice_required || 'Contact for info'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Additional Services</h2>
+                    <div class="detail-grid">
+                        <div class="detail-grid-item">
+                            <label>Support Type</label>
+                            <span>${r.support_type || 'Contact for info'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Meeting Frequency</label>
+                            <span>${r.meeting_frequency || 'Contact for info'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Virtual Options</label>
+                            <span>${hasVirtual ? 'Yes' : 'No'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Sibling Programs</label>
+                            <span>${hasSiblingPrograms ? 'Yes' : 'No'}</span>
+                        </div>
+                        <div class="detail-grid-item">
+                            <label>Transportation Provided</label>
+                            <span>${hasTransportation ? 'Yes' : 'No'}</span>
+                        </div>
+                        ${r.cancellation_policy ? `
+                            <div class="detail-grid-item">
+                                <label>Cancellation Policy</label>
+                                <span>${r.cancellation_policy}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                ${r.eligibility_criteria ? `
+                    <div class="detail-section">
+                        <h2 class="detail-section-title">Eligibility</h2>
+                        <div class="detail-description">
+                            <p>${r.eligibility_criteria}</p>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${r.address ? `
+                    <div class="detail-note-card" style="background: #fff7ed; border-color: #fdba74;">
+                        <h3 style="color: #c2410c;">&#128205; Location</h3>
+                        <p style="color: #9a3412;">${r.address}</p>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+};
+
 const renderInspirationDetail = () => {
     const p = inspirationData.find(prof => prof.profile_id === currentDetailId);
     if (!p) return '<div class="detail-page"><div class="detail-content">Profile not found</div></div>';
@@ -1126,6 +1494,8 @@ const render = () => {
             content = renderFinancialDetail();
         } else if (currentDetailType === 'therapy') {
             content = renderTherapyDetail();
+        } else if (currentDetailType === 'respite') {
+            content = renderRespiteDetail();
         } else if (currentDetailType === 'inspiration') {
             content = renderInspirationDetail();
         }
@@ -1175,7 +1545,13 @@ const render = () => {
     if (searchContainer) {
         const input = getOrCreateSearchInput();
         // Update placeholder based on current tab
-        input.placeholder = currentResourceTab === 'therapy' ? 'Search services...' : 'Search resources...';
+        if (currentResourceTab === 'therapy') {
+            input.placeholder = 'Search services...';
+        } else if (currentResourceTab === 'respite') {
+            input.placeholder = 'Search respite care...';
+        } else {
+            input.placeholder = 'Search resources...';
+        }
         searchContainer.appendChild(input);
 
         // Restore focus if it had focus before render
