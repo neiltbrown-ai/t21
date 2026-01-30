@@ -173,19 +173,138 @@ const getValueBadge = (r) => {
 
 const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
 
+// ============== ROUTING ==============
+// Build URL from current state
+const getUrlForState = (page, type = null, id = null, tab = null) => {
+    if (page === 'home') return '/';
+    if (page === 'about') return '/about';
+    if (page === 'inspiration' || (page === 'detail' && type === 'inspiration')) {
+        return id ? `/inspiration/${id}` : '/inspiration';
+    }
+    if (page === 'resources' || page === 'detail') {
+        // For resources page or detail pages
+        if (type === 'financial' || (!type && (tab === 'financial' || currentResourceTab === 'financial'))) {
+            return id ? `/resources/${id}` : '/resources';
+        }
+        if (type === 'therapy' || (!type && tab === 'therapy')) {
+            return id ? `/therapy/${id}` : '/therapy';
+        }
+        if (type === 'respite' || (!type && tab === 'respite')) {
+            return id ? `/respite/${id}` : '/respite';
+        }
+        // Default to /resources for financial tab
+        return '/resources';
+    }
+    return '/';
+};
+
+// Parse URL and return state object
+const parseUrl = (pathname) => {
+    const path = pathname || window.location.pathname;
+    const segments = path.split('/').filter(Boolean);
+
+    if (segments.length === 0) {
+        return { page: 'home', type: null, id: null, tab: 'financial' };
+    }
+
+    const firstSegment = segments[0];
+
+    if (firstSegment === 'about') {
+        return { page: 'about', type: null, id: null, tab: 'financial' };
+    }
+
+    if (firstSegment === 'inspiration') {
+        if (segments[1]) {
+            return { page: 'detail', type: 'inspiration', id: segments[1], tab: 'financial' };
+        }
+        return { page: 'inspiration', type: null, id: null, tab: 'financial' };
+    }
+
+    if (firstSegment === 'resources') {
+        if (segments[1]) {
+            return { page: 'detail', type: 'financial', id: segments[1], tab: 'financial' };
+        }
+        return { page: 'resources', type: null, id: null, tab: 'financial' };
+    }
+
+    if (firstSegment === 'therapy') {
+        if (segments[1]) {
+            return { page: 'detail', type: 'therapy', id: segments[1], tab: 'therapy' };
+        }
+        return { page: 'resources', type: null, id: null, tab: 'therapy' };
+    }
+
+    if (firstSegment === 'respite') {
+        if (segments[1]) {
+            return { page: 'detail', type: 'respite', id: segments[1], tab: 'respite' };
+        }
+        return { page: 'resources', type: null, id: null, tab: 'respite' };
+    }
+
+    return { page: 'home', type: null, id: null, tab: 'financial' };
+};
+
+// Apply state from parsed URL
+const applyState = (state, shouldRender = true) => {
+    currentPage = state.page;
+    currentDetailType = state.type;
+    currentDetailId = state.id;
+    if (state.tab) {
+        currentResourceTab = state.tab;
+    }
+    if (shouldRender) {
+        render();
+    }
+};
+
 // ============== NAVIGATION ==============
-window.navigate = function(page, type = null, id = null) {
+window.navigate = function(page, type = null, id = null, pushState = true) {
     currentPage = page;
     currentDetailType = type;
     currentDetailId = id;
+
+    // Build URL and push to history
+    if (pushState) {
+        const url = getUrlForState(page, type, id);
+        history.pushState({ page, type, id, tab: currentResourceTab }, '', url);
+    }
+
     render();
     window.scrollTo(0, 0);
 }
 
-window.switchResourceTab = function(tab) {
+window.switchResourceTab = function(tab, pushState = true) {
     currentResourceTab = tab;
+
+    // Update URL when switching tabs
+    if (pushState && currentPage === 'resources') {
+        const url = getUrlForState('resources', null, null, tab);
+        history.pushState({ page: 'resources', type: null, id: null, tab }, '', url);
+    }
+
     render();
 }
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', (event) => {
+    if (event.state) {
+        applyState(event.state);
+    } else {
+        // No state - parse from URL
+        const state = parseUrl();
+        applyState(state);
+    }
+    window.scrollTo(0, 0);
+});
+
+// Initialize state from URL on page load
+const initializeFromUrl = () => {
+    const state = parseUrl();
+    // Replace current history entry with state
+    const url = getUrlForState(state.page, state.type, state.id, state.tab);
+    history.replaceState({ page: state.page, type: state.type, id: state.id, tab: state.tab }, '', url);
+    applyState(state, false); // Don't render yet, data loading will trigger render
+};
 
 window.toggleMenu = function() {
     const menu = document.getElementById('mobileMenu');
@@ -638,8 +757,8 @@ const renderHomePage = () => `
             <h1>Resources for the Down Syndrome Community</h1>
             <p>A comprehensive directory of financial resources, healthcare services, and inspiring individuals. Built by the community, for the community.</p>
             <div class="home-hero-buttons">
-                <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Browse Resources &#8594;</a>
-                <a href="#" class="btn btn-secondary-light" onclick="navigate('inspiration'); return false;">Meet Inspiring Individuals &#8594;</a>
+                <a href="/resources" class="btn btn-primary" onclick="navigate('resources'); return false;">Browse Resources &#8594;</a>
+                <a href="/inspiration" class="btn btn-secondary-light" onclick="navigate('inspiration'); return false;">Meet Inspiring Individuals &#8594;</a>
             </div>
         </div>
     </div>
@@ -681,7 +800,7 @@ const renderHomePage = () => `
             <p>Find the support you need, from financial assistance to healthcare to inspiring role models.</p>
         </div>
         <div class="home-cards four-col">
-            <a href="#" class="home-card blue" onclick="navigate('resources'); return false;">
+            <a href="/resources" class="home-card blue" onclick="navigate('resources'); return false;">
                 <div class="home-card-content">
                     <div class="home-card-icon" style="background: var(--color-primary);">
                         <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -696,7 +815,7 @@ const renderHomePage = () => `
                     <span class="home-card-link">Browse Resources &#8594;</span>
                 </div>
             </a>
-            <a href="#" class="home-card purple" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">
+            <a href="/therapy" class="home-card purple" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">
                 <div class="home-card-content">
                     <div class="home-card-icon" style="background: #8b5cf6;">
                         <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
@@ -711,7 +830,7 @@ const renderHomePage = () => `
                     <span class="home-card-link">Find Services &#8594;</span>
                 </div>
             </a>
-            <a href="#" class="home-card orange" onclick="switchResourceTab('respite'); navigate('resources'); return false;">
+            <a href="/respite" class="home-card orange" onclick="switchResourceTab('respite'); navigate('resources'); return false;">
                 <div class="home-card-content">
                     <div class="home-card-icon" style="background: #f97316;">
                         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -726,7 +845,7 @@ const renderHomePage = () => `
                     <span class="home-card-link">Find Respite Care &#8594;</span>
                 </div>
             </a>
-            <a href="#" class="home-card teal" onclick="navigate('inspiration'); return false;">
+            <a href="/inspiration" class="home-card teal" onclick="navigate('inspiration'); return false;">
                 <div class="home-card-content">
                     <div class="home-card-icon" style="background: var(--color-secondary);">
                         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -819,7 +938,7 @@ const renderResourcesResults = () => {
                 const isExpert = (r.ds_experience_level || '').includes('Expert');
 
                 return `
-                    <div class="card" onclick="navigate('detail', 'therapy', '${r.resource_id}')">
+                    <div class="card" onclick="navigate('detail', 'therapy', '${r.id || r.resource_id}')">
                         <div class="card-image therapy">Healthcare</div>
                         <div class="card-body">
                             <div class="card-title">${r.resource_name || ''}</div>
@@ -987,7 +1106,7 @@ const renderFinancialDetail = () => {
         <div class="detail-page">
             <div class="detail-back-bar">
                 <div class="detail-back-bar-content">
-                    <a href="#" class="back-link" onclick="navigate('resources'); return false;">&#8592; Back to Resources</a>
+                    <a href="/resources" class="back-link" onclick="navigate('resources'); return false;">&#8592; Back to Resources</a>
                 </div>
             </div>
             <div class="detail-content">
@@ -1078,7 +1197,7 @@ const renderFinancialDetail = () => {
 };
 
 const renderTherapyDetail = () => {
-    const r = therapyData.find(res => res.resource_id === currentDetailId);
+    const r = therapyData.find(res => (res.id || res.resource_id) === currentDetailId);
     if (!r) return '<div class="detail-page"><div class="detail-content">Resource not found</div></div>';
     
     const services = (r.subcategories || '').split(';').map(s => s.trim()).filter(Boolean);
@@ -1087,7 +1206,7 @@ const renderTherapyDetail = () => {
         <div class="detail-page">
             <div class="detail-back-bar">
                 <div class="detail-back-bar-content">
-                    <a href="#" class="back-link" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">&#8592; Back to Healthcare &amp; Therapy</a>
+                    <a href="/therapy" class="back-link" onclick="switchResourceTab('therapy'); navigate('resources'); return false;">&#8592; Back to Healthcare &amp; Therapy</a>
                 </div>
             </div>
             <div class="detail-content">
@@ -1181,7 +1300,7 @@ const renderRespiteDetail = () => {
         <div class="detail-page">
             <div class="detail-back-bar">
                 <div class="detail-back-bar-content">
-                    <a href="#" class="back-link" onclick="switchResourceTab('respite'); navigate('resources'); return false;">&#8592; Back to Respite &amp; Caregiving</a>
+                    <a href="/respite" class="back-link" onclick="switchResourceTab('respite'); navigate('resources'); return false;">&#8592; Back to Respite &amp; Caregiving</a>
                 </div>
             </div>
             <div class="detail-content">
@@ -1325,7 +1444,7 @@ const renderInspirationDetail = () => {
         <div class="detail-page">
             <div class="detail-back-bar">
                 <div class="detail-back-bar-content">
-                    <a href="#" class="back-link" onclick="navigate('inspiration'); return false;">&#8592; Back to Inspiration</a>
+                    <a href="/inspiration" class="back-link" onclick="navigate('inspiration'); return false;">&#8592; Back to Inspiration</a>
                 </div>
             </div>
             <div class="detail-content">
@@ -1441,7 +1560,7 @@ const renderAboutPage = () => `
                 <h2>Join Us</h2>
                 <p>T21 is a community effort. We're building this directory together &mdash; parents, advocates, organizations, and allies who believe every family deserves access to the resources that can change lives.</p>
                 <div class="about-cta-buttons">
-                    <a href="#" class="btn btn-primary" onclick="navigate('resources'); return false;">Explore Resources &rarr;</a>
+                    <a href="/resources" class="btn btn-primary" onclick="navigate('resources'); return false;">Explore Resources &rarr;</a>
                     <button class="btn btn-secondary">Submit a Resource</button>
                     <button class="btn btn-secondary">Get Involved</button>
                 </div>
@@ -1512,12 +1631,12 @@ const render = () => {
     const header = `
         <header>
             <div class="header-content">
-                <a href="#" class="logo" onclick="navigate('home'); return false;">T21</a>
+                <a href="/" class="logo" onclick="navigate('home'); return false;">T21</a>
                 <nav>
-                    <a href="#" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); return false;">Home</a>
-                    <a href="#" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); return false;">Resources</a>
-                    <a href="#" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); return false;">Inspiration</a>
-                    <a href="#" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); return false;">About</a>
+                    <a href="/" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); return false;">Home</a>
+                    <a href="/resources" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); return false;">Resources</a>
+                    <a href="/inspiration" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); return false;">Inspiration</a>
+                    <a href="/about" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); return false;">About</a>
                     <a href="#">Contact</a>
                     <a href="#">Give</a>
                 </nav>
@@ -1525,10 +1644,10 @@ const render = () => {
             </div>
         </header>
         <div class="mobile-menu-overlay" id="mobileMenu">
-            <a href="#" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); closeMenu(); return false;">Home</a>
-            <a href="#" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); closeMenu(); return false;">Resources</a>
-            <a href="#" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); closeMenu(); return false;">Inspiration</a>
-            <a href="#" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); closeMenu(); return false;">About</a>
+            <a href="/" class="${currentPage === 'home' ? 'active' : ''}" onclick="navigate('home'); closeMenu(); return false;">Home</a>
+            <a href="/resources" class="${currentPage === 'resources' ? 'active' : ''}" onclick="navigate('resources'); closeMenu(); return false;">Resources</a>
+            <a href="/inspiration" class="${currentPage === 'inspiration' ? 'active' : ''}" onclick="navigate('inspiration'); closeMenu(); return false;">Inspiration</a>
+            <a href="/about" class="${currentPage === 'about' ? 'active' : ''}" onclick="navigate('about'); closeMenu(); return false;">About</a>
             <a href="#" onclick="closeMenu();">Contact</a>
             <a href="#" onclick="closeMenu();">Give</a>
         </div>
@@ -1565,4 +1684,6 @@ const render = () => {
 };
 
 // ============== INITIALIZE ==============
+// Parse URL first to set initial state, then load data
+initializeFromUrl();
 loadData();
