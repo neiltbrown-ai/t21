@@ -79,15 +79,22 @@ let respiteFilters = {
 // ============== DATA LOADING ==============
 async function loadData() {
     try {
-        // Load JSON files for financial, therapy, and inspiration
-        const [fin, ther, insp] = await Promise.all([
-            fetch('data/financial.json').then(r => r.json()),
-            fetch('data/therapy.json').then(r => r.json()),
-            fetch('data/inspiration.json').then(r => r.json())
+        // Load therapy and inspiration from JSON files
+        const [ther, insp] = await Promise.all([
+            fetch('/data/therapy.json').then(r => r.json()),
+            fetch('/data/inspiration.json').then(r => r.json())
         ]);
-        resourcesData = fin;
         therapyData = ther;
         inspirationData = insp;
+
+        // Load financial resources from Supabase
+        const { data: financial, error: financialError } = await supabaseClient.from('financial_resources').select('*');
+        if (financialError) {
+            console.error('Error loading financial data:', financialError);
+            resourcesData = [];
+        } else {
+            resourcesData = financial || [];
+        }
 
         // Load respite data from Supabase
         const { data: respite, error: respiteError } = await supabaseClient.from('respite_caregiving').select('*');
@@ -99,10 +106,22 @@ async function loadData() {
         }
 
         console.log(`Loaded: ${resourcesData.length} financial, ${therapyData.length} therapy, ${inspirationData.length} inspiration, ${respiteData.length} respite`);
+
+        // Hide page loader and render
+        hidePageLoader();
         render();
     } catch (err) {
         console.error('Error loading data:', err);
+        hidePageLoader();
         document.getElementById('app').innerHTML = '<div style="padding: 2rem; text-align: center;">Error loading data. Please refresh.</div>';
+    }
+}
+
+// Hide the page loader
+function hidePageLoader() {
+    const loader = document.querySelector('.page-loader');
+    if (loader) {
+        loader.style.display = 'none';
     }
 }
 
@@ -973,15 +992,15 @@ const renderResourcesResults = () => {
             ${visibleFinancial.map(r => {
                 const badge = getValueBadge(r);
                 return `
-                    <div class="card" onclick="navigate('detail', 'financial', '${r.program_id}')">
+                    <div class="card" onclick="navigate('detail', 'financial', '${r.id || r.program_id}')">
                         <div class="card-image">Financial</div>
                         <div class="card-body">
-                            <div class="card-title">${r.program_name || ''}</div>
-                            <div class="card-org">${r.organization_type || ''}</div>
-                            <div class="card-desc">${(r.program_description || '').substring(0, 150)}${(r.program_description || '').length > 150 ? '...' : ''}</div>
+                            <div class="card-title">${r.resource_name || r.program_name || ''}</div>
+                            <div class="card-org">${r.organization_name || r.organization_type || ''}</div>
+                            <div class="card-desc">${(r.short_description || r.program_description || '').substring(0, 150)}${(r.short_description || r.program_description || '').length > 150 ? '...' : ''}</div>
                             <div class="card-tags">
-                                <span class="card-tag">${r.program_category || ''}</span>
-                                <span class="card-tag">${r.geographic_coverage || ''}</span>
+                                <span class="card-tag">${r.subcategories || r.program_category || ''}</span>
+                                <span class="card-tag">${r.jurisdiction_level || r.geographic_coverage || ''}</span>
                                 ${r.income_limit === 'None' || !r.income_limit ? '<span class="card-tag highlight">No Income Limits</span>' : ''}
                             </div>
                         </div>
@@ -1094,14 +1113,20 @@ const renderInspirationPage = () => {
 
 // ============== RENDER: DETAIL PAGES ==============
 const renderFinancialDetail = () => {
-    const r = resourcesData.find(res => res.program_id === currentDetailId);
+    const r = resourcesData.find(res => (res.id || res.program_id) === currentDetailId);
     if (!r) return '<div class="detail-page"><div class="detail-content">Resource not found</div></div>';
-    
+
     const badge = getValueBadge(r);
-    const ageMin = r.age_range_min || 0;
-    const ageMax = r.age_range_max || 99;
+    const ageMin = r.age_min || r.age_range_min || 0;
+    const ageMax = r.age_max || r.age_range_max || 99;
     const ageRange = `${ageMin === 0 ? 'Birth' : ageMin} \u2013 ${ageMax >= 99 ? 'All ages' : ageMax + ' years'}`;
-    
+    const resourceName = r.resource_name || r.program_name || '';
+    const orgName = r.organization_name || r.organization_type || '';
+    const description = r.full_description || r.short_description || r.program_description || '';
+    const category = r.subcategories || r.program_category || '';
+    const coverage = r.jurisdiction_level || r.geographic_coverage || '';
+    const keyFeatures = r.key_features || r['key_features_&_benefits'] || '';
+
     return `
         <div class="detail-page">
             <div class="detail-back-bar">
@@ -1111,42 +1136,42 @@ const renderFinancialDetail = () => {
             </div>
             <div class="detail-content">
                 <div class="detail-image-banner">
-                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.program_name}">` : ''}
+                    ${r.image_url ? `<img src="${r.image_url}" alt="${resourceName}">` : ''}
                 </div>
-                
-                <h1 class="detail-title">${r.program_name}</h1>
-                <p class="detail-org">${r.organization_type || ''}</p>
-                
+
+                <h1 class="detail-title">${resourceName}</h1>
+                <p class="detail-org">${orgName}</p>
+
                 <div class="detail-amount-box">
                     <div class="detail-amount-label">${badge.label}</div>
                     <div class="detail-amount-value">${badge.value}</div>
                     ${r.annual_cap ? `<div style="font-size: 0.85rem; color: var(--color-gray-text); margin-top: 0.25rem;">Up to $${Number(r.annual_cap).toLocaleString()}/year</div>` : ''}
                 </div>
-                
+
                 <div class="detail-tags">
-                    <span class="detail-tag">${r.program_category || ''}</span>
-                    <span class="detail-tag">${r.geographic_coverage || ''}</span>
+                    <span class="detail-tag">${category}</span>
+                    <span class="detail-tag">${coverage}</span>
                     ${!r.income_limit || r.income_limit === 'None' ? '<span class="detail-tag green">No Income Limits</span>' : ''}
                 </div>
-                
+
                 <div class="detail-description">
-                    ${(r.program_description || '').split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                    ${description.split('\n\n').map(p => `<p>${p}</p>`).join('')}
                 </div>
-                
+
                 <div class="detail-actions">
                     ${r.website ? `<a href="${r.website.startsWith('http') ? r.website : 'https://' + r.website}" target="_blank" class="btn btn-primary">Visit Website &#8594;</a>` : ''}
                     ${r.phone ? `<a href="tel:${r.phone.replace(/[^0-9]/g, '')}" class="btn btn-secondary">&#128222; ${r.phone}</a>` : ''}
                 </div>
-                
-                ${r['key_features_&_benefits'] ? `
+
+                ${keyFeatures ? `
                     <div class="detail-section">
                         <h2 class="detail-section-title">Key Features &amp; Benefits</h2>
                         <div class="detail-description">
-                            <p style="white-space: pre-line;">${r['key_features_&_benefits']}</p>
+                            <p style="white-space: pre-line;">${keyFeatures}</p>
                         </div>
                     </div>
                 ` : ''}
-                
+
                 <div class="detail-section">
                     <h2 class="detail-section-title">Eligibility &amp; Details</h2>
                     <div class="detail-grid">
@@ -1156,7 +1181,7 @@ const renderFinancialDetail = () => {
                         </div>
                         <div class="detail-grid-item">
                             <label>Application Deadline</label>
-                            <span>${r.application_deadline || 'Rolling'}</span>
+                            <span>${r.application_deadline || r.application_status || 'Rolling'}</span>
                         </div>
                         <div class="detail-grid-item">
                             <label>Income Limits</label>
