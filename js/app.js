@@ -938,7 +938,7 @@ const renderResourcesResults = () => {
                 const isExpert = (r.ds_experience_level || '').includes('Expert');
 
                 return `
-                    <div class="card" onclick="navigate('detail', 'therapy', '${r.resource_id}')">
+                    <div class="card" onclick="navigate('detail', 'therapy', '${r.id || r.resource_id}')">
                         <div class="card-image therapy">Healthcare</div>
                         <div class="card-body">
                             <div class="card-title">${r.resource_name || ''}</div>
@@ -1197,7 +1197,7 @@ const renderFinancialDetail = () => {
 };
 
 const renderTherapyDetail = () => {
-    const r = therapyData.find(res => res.resource_id === currentDetailId);
+    const r = therapyData.find(res => (res.id || res.resource_id) === currentDetailId);
     if (!r) return '<div class="detail-page"><div class="detail-content">Resource not found</div></div>';
     
     const services = (r.subcategories || '').split(';').map(s => s.trim()).filter(Boolean);
