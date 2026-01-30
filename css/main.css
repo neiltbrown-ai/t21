@@ -1763,20 +1763,12 @@
     color: #ea580c;
 }
 
-/* Adjust home cards to 4 columns for full layout */
-@media (min-width: 1200px) {
-    .home-cards.four-col {
-        grid-template-columns: repeat(4, 1fr);
-    }
+/* Home cards layout: 2 per row (scales for future categories) */
+.home-cards.four-col {
+    grid-template-columns: repeat(2, 1fr);
 }
 
-@media (min-width: 1024px) and (max-width: 1199px) {
-    .home-cards.four-col {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 1023px) {
+@media (max-width: 768px) {
     .home-cards.four-col {
         grid-template-columns: 1fr;
     }
