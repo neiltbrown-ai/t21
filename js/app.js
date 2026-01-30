@@ -178,7 +178,7 @@ const getInitials = (name) => name ? name.split(' ').map(n => n[0]).join('').sli
 const getUrlForState = (page, type = null, id = null, tab = null) => {
     if (page === 'home') return '/';
     if (page === 'about') return '/about';
-    if (page === 'inspiration') {
+    if (page === 'inspiration' || (page === 'detail' && type === 'inspiration')) {
         return id ? `/inspiration/${id}` : '/inspiration';
     }
     if (page === 'resources' || page === 'detail') {
