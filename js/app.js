@@ -81,8 +81,8 @@ async function loadData() {
     try {
         // Load therapy and inspiration from JSON files
         const [ther, insp] = await Promise.all([
-            fetch('data/therapy.json').then(r => r.json()),
-            fetch('data/inspiration.json').then(r => r.json())
+            fetch('/data/therapy.json').then(r => r.json()),
+            fetch('/data/inspiration.json').then(r => r.json())
         ]);
         therapyData = ther;
         inspirationData = insp;
